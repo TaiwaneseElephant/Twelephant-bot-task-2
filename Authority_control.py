@@ -73,7 +73,7 @@ if __name__ == "__main__":
     try:
         viewed = json.loads(viewed_json.text)
         log = json.loads(log_json.text)
-        assert isinstance(viewed, log, list)
+        assert isinstance(viewed, list) and isinstance(log, list)
     except:
         viewed = []
         log = []
