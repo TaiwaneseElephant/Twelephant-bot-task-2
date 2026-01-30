@@ -57,7 +57,7 @@ def has_authority_control(page, AUTHORITY_CONTROL_ID:tuple) -> bool:
         pass
     return False
 
-def add_authority_control_template(page):
+def add_authority_control_template(page) -> None:
     text = page.get(force = True)
     match = BOTTOM_PATTERN.search(text)
     if match != None:
@@ -65,7 +65,7 @@ def add_authority_control_template(page):
         text = f"{text[:place]}\n{{{{Authority control}}}}\n{text[place:]}"
     save(site, page, text, "根據維基數據資料添加[[Template:Authority control|權威控制模板]]")
 
-def need_authority_control_template(page, AUTHORITY_CONTROL_ID:tuple) -> bool:
+def need_authority_control_template(page, AUTHORITY_CONTROL_ID:set) -> bool:
     if page.isRedirectPage():
         return False
     text = page.get(force = True)
