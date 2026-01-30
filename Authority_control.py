@@ -58,7 +58,7 @@ def has_authority_control(page, AUTHORITY_CONTROL_ID:tuple) -> bool:
     return False
 
 def add_authority_control_template(page):
-    text = page.text
+    text = page.get(force = True)
     match = BOTTOM_PATTERN.search(text)
     if match != None:
         place = match.start()
