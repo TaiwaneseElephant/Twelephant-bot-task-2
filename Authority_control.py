@@ -82,10 +82,9 @@ if __name__ == "__main__":
         if need_authority_control_template(page, AUTHORITY_CONTROL_ID):
             save(site, page, "{{Authority control}}", "根據維基數據資料添加[[Template:Authority control|權威控制模板]]", add = True)
             log.append(title)
-            if len(log) % 50 == 0:
-                save(site, log_json, json.dumps(log), "Update log")
-                if not check_switch(site, "User:Twelephant-bot/setting.json"):
-                  break
+            save(site, log_json, json.dumps(log), "Update log")
+            if not check_switch(site, "User:Twelephant-bot/setting.json"):
+                break
         viewed.add(title)
         if len(viewed) % 50 == 0:
             save(site, viewed_json, json.dumps(list(viewed)), "Update log")
