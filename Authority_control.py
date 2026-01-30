@@ -78,8 +78,6 @@ if __name__ == "__main__":
         viewed = []
         log = []
     for page in pagegenerators.AllpagesPageGenerator(site):
-        if not check_switch(site, "User:Twelephant-bot/setting.json"):
-            continue
         title = page.title()
         if title in viewed:
             continue
@@ -88,6 +86,10 @@ if __name__ == "__main__":
             log.append(title)
             if len(log) % 50 == 0:
                 save(site, log_json, json.dumps(log), "Update log")
+                if not check_switch(site, "User:Twelephant-bot/setting.json"):
+                  break
         viewed.append(title)
         if len(viewed) % 50 == 0:
             save(site, viewed_json, json.dumps(viewed), "Update log")
+            if not check_switch(site, "User:Twelephant-bot/setting.json"):
+                break
