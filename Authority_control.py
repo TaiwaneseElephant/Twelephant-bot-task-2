@@ -8,7 +8,7 @@ AUTHORITY_CONTROL_ID = {268, 214, 7859, 3372, 6804, 1907, 4186, 2092, 1908, 1707
                         3065, 781, 1362, 691, 1890, 950, 9984, 3348, 1375, 8189, 1736, 396, 3863, 1986, 8034, 349, 271, 5034, 1368, 651, 1006, 650, 350, 1695, 7293, 1003, \
                         947, 906, 5587, 7314, 1048, 2558}
 
-BOTTOM_PATTERN = re.compile(r"\[\[\s(?:[Cc]at|[Cc]atgory):.*?\s\]\]|(?:\{\{\s(?:DEFAULTSORT:.*?|[Ss]tub(?:\|.*?)?|.*?-stub(?:\|.*?)?|.*?小作品(?:\|.*?)?|小條目(?:\|.*?)?)\s\}\})", flags = re.DOTALL)
+BOTTOM_PATTERN = re.compile(r"\[\[\s(?:[Cc]at|[Cc]ategory):.*?\s\]\]|(?:\{\{\s(?:DEFAULTSORT:.*?|[Ss]tub(?:\|.*?)?|.*?-stub(?:\|.*?)?|.*?小作品(?:\|.*?)?|小條目(?:\|.*?)?)\s\}\})", flags = re.DOTALL)
 
 def save(site, page, text:str, summary:str = "", add:bool = False, minor:bool = True, max_retry_times:int = 3):
     e = None
