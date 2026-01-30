@@ -61,9 +61,9 @@ def add_authority_control_template(page):
     text = page.text
     place = 0
     find = BOTTOM_PATTERN.findall(text)
-    if find != None:
+    if find != []:
         text = BOTTOM_PATTERN.sub("", text)
-        text += f"\n\{\{Authority control\}\}{'\n'.join(list(find.group()))}"
+        text += f"\n\{\{Authority control\}\}{'\n'.join([i.group() for i in find)])}"
     save(site, page, text, "根據維基數據資料添加[[Template:Authority control|權威控制模板]]")
 
 def need_authority_control_template(page, AUTHORITY_CONTROL_ID:tuple) -> bool:
