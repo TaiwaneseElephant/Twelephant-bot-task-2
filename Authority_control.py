@@ -74,8 +74,9 @@ if __name__ == "__main__":
         viewed = json.loads(viewed_json.text)
         log = json.loads(log_json.text)
         assert isinstance(viewed, list) and isinstance(log, list)
+        viewed = set(viewed)
     except:
-        viewed = []
+        viewed = {}
         log = []
     for page in pagegenerators.AllpagesPageGenerator(site):
         title = page.title()
@@ -88,8 +89,8 @@ if __name__ == "__main__":
                 save(site, log_json, json.dumps(log), "Update log")
                 if not check_switch(site, "User:Twelephant-bot/setting.json"):
                   break
-        viewed.append(title)
+        viewed.add(title)
         if len(viewed) % 50 == 0:
-            save(site, viewed_json, json.dumps(viewed), "Update log")
+            save(site, viewed_json, json.dumps(list(viewed)), "Update log")
             if not check_switch(site, "User:Twelephant-bot/setting.json"):
                 break
