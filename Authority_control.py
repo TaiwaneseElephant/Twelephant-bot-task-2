@@ -90,7 +90,7 @@ if __name__ == "__main__":
         title = page.title()
         if title in viewed:
             continue
-        if need_authority_control_template(page, AUTHORITY_CONTROL_ID):
+        if need_authority_control_template(page, AUTHORITY_CONTROL_ID) and page.botMayEdit():
             add_authority_control_template(page)
             log.append(title)
             save(site, log_json, json.dumps(log), "Update log")
