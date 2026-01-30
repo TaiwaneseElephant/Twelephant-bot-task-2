@@ -98,6 +98,7 @@ if __name__ == "__main__":
                 break
         viewed.add(title)
         if len(viewed) % 50 == 0:
-            save(site, viewed_json, json.dumps(list(viewed)), "Update log")
+            save(site, viewed_json, json.dumps(list(viewed)), "Update record")
             if not check_switch(site, "User:Twelephant-bot/setting.json"):
                 break
+    save(site, viewed_json, "[]", "Clean up")
