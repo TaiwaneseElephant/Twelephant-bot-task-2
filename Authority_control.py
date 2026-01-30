@@ -73,7 +73,7 @@ if __name__ == "__main__":
     except:
         viewed = set()
         log = []
-    for page in pagegenerators.AllpagesPageGenerator(site = site, includeredirects = False):
+    for page in pagegenerators.AllpagesPageGenerator(site = site, filterredir = False):
         title = page.title()
         if title in viewed:
             continue
