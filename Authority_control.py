@@ -1,5 +1,5 @@
 import pywikibot
-from pywikibot import pagegenerators
+from pywikibot import pagegenerators, textlib
 import json
 
 AUTHORITY_CONTROL_ID = {268, 214, 7859, 3372, 6804, 1907, 4186, 2092, 1908, 1707, 6829, 2349, 6792, 227, 1960, 347, 1248, 244, 1225, 2041, 409, 2750, 650, 350, 781, \
@@ -57,10 +57,11 @@ def has_authority_control(page, AUTHORITY_CONTROL_ID:tuple) -> bool:
 def need_authority_control_template(page, AUTHORITY_CONTROL_ID:tuple) -> bool:
     if page.isRedirectPage():
         return False
+    text = page.text
     for i in ("{{Authority control", "{{authority control", "{{規範控制", "{{规范控制", "{{權威控制", "{{权威控制"):
         if i in text:
             return False
-    return has_authority_control(page, AUTHORITY_CONTROL_ID):
+    return has_authority_control(page, AUTHORITY_CONTROL_ID)
 
 if __name__ == "__main__":
     site = pywikibot.Site("wikipedia:zh")
