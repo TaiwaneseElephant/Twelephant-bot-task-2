@@ -1,6 +1,7 @@
 import pywikibot
 from pywikibot import pagegenerators, textlib
 import json
+import re
 
 AUTHORITY_CONTROL_ID = {268, 214, 7859, 3372, 6804, 1907, 4186, 2092, 1908, 1707, 6829, 2349, 6792, 227, 1960, 347, 1248, 244, 1225, 2041, 409, 2750, 650, 350, 781, \
                         3430, 3544, 1315, 245, 1986, 7902, 651, 791, 7303, 3563, 4055, 3223, 4423, 3723, 3993, 3562, 2980, 4038, 3920, 4143, 3863, 3601, 902, 886, \
@@ -54,6 +55,16 @@ def has_authority_control(page, AUTHORITY_CONTROL_ID:tuple) -> bool:
         pass
     return False
 
+def add_authority_control_template(page):
+    text_list = page.text.split("\n")[::-1]
+    place = 0
+    for i in range(len(text_list)):
+        if re.findall(r"(?:\{\{DEFAULTSORT:|\[\[(?:[Cc]at|[Cc]atgory):.*?\]\]|\{\{[Ss]tub|\{\{.*?-stub|\{\{.*?小作品|\{\{小條目)", text_list[i+1].replace(" ", "")):
+          place = i+2
+    text_list.insert(place, "{{Authority control}}")
+    text = "\n".join(text_list[::-1])
+    save(site, page, text, "根據維基數據資料添加[[Template:Authority control|權威控制模板]]")
+
 def need_authority_control_template(page, AUTHORITY_CONTROL_ID:tuple) -> bool:
     if page.isRedirectPage():
         return False
@@ -80,7 +91,7 @@ if __name__ == "__main__":
         if title in viewed:
             continue
         if need_authority_control_template(page, AUTHORITY_CONTROL_ID):
-            save(site, page, "{{Authority control}}", "根據維基數據資料添加[[Template:Authority control|權威控制模板]]", add = True)
+            add_authority_control_template(page)
             log.append(title)
             save(site, log_json, json.dumps(log), "Update log")
             if not check_switch(site, "User:Twelephant-bot/setting.json"):
