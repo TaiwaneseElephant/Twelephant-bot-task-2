@@ -62,7 +62,7 @@ def add_authority_control_template(page):
     match = BOTTOM_PATTERN.search(text)
     if match != None:
         place = match.start()
-        f"{text[:place]}\{\{Authority control\}\}{text[place:]}"
+        text = f"{text[:place]}\{\{Authority control\}\}{text[place:]}"
     save(site, page, text, "根據維基數據資料添加[[Template:Authority control|權威控制模板]]")
 
 def need_authority_control_template(page, AUTHORITY_CONTROL_ID:tuple) -> bool:
