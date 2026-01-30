@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pywikibot
 from pywikibot import pagegenerators, textlib
 import json
@@ -45,7 +46,7 @@ def check_switch(site, switch_page_name:str) -> bool:
     switch_page = pywikibot.Page(site, switch_page_name)
     return json.loads(switch_page.text)["Automatically add authority control template"]["Enable"]
 
-def has_authority_control(page, AUTHORITY_CONTROL_ID:tuple) -> bool:
+def has_authority_control(page) -> bool:
     try:
         item = pywikibot.ItemPage.fromPage(page)
         repo = item.repo
@@ -65,7 +66,7 @@ def add_authority_control_template(page) -> None:
         text = f"{text[:place]}\n{{{{Authority control}}}}\n{text[place:]}"
     save(site, page, text, "根據維基數據資料添加[[Template:Authority control|權威控制模板]]")
 
-def need_authority_control_template(page, AUTHORITY_CONTROL_ID:set) -> bool:
+def need_authority_control_template(page) -> bool:
     if page.isRedirectPage():
         return False
     text = page.get(force = True)
@@ -74,7 +75,7 @@ def need_authority_control_template(page, AUTHORITY_CONTROL_ID:set) -> bool:
             return False
     return has_authority_control(page, AUTHORITY_CONTROL_ID)
 
-if __name__ == "__main__":
+def main():
     site = pywikibot.Site("wikipedia:zh")
     log_json = pywikibot.Page(site, "User:Twelephant-bot/task/2/log.json")
     viewed_json = pywikibot.Page(site, "User:Twelephant-bot/task/2/viewed.json")
@@ -90,7 +91,7 @@ if __name__ == "__main__":
         title = page.title()
         if title in viewed:
             continue
-        if need_authority_control_template(page, AUTHORITY_CONTROL_ID) and page.botMayEdit():
+        if need_authority_control_template(page) and page.botMayEdit():
             add_authority_control_template(page)
             log.append(title)
             save(site, log_json, json.dumps(log), "Update log")
@@ -102,3 +103,6 @@ if __name__ == "__main__":
             if not check_switch(site, "User:Twelephant-bot/setting.json"):
                 break
     save(site, viewed_json, "[]", "Clean up")
+
+if __name__ == "__main__":
+    main()
