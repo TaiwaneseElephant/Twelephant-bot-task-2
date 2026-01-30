@@ -55,6 +55,8 @@ def has_authority_control(page, AUTHORITY_CONTROL_ID:tuple) -> bool:
     return False
 
 def need_authority_control_template(page, AUTHORITY_CONTROL_ID:tuple) -> bool:
+    if page.isRedirectPage():
+        return False
     text = page.text
     for i in ("{{Authority control", "{{authority control", "{{規範控制", "{{规范控制", "{{權威控制", "{{权威控制"):
         if i in text:
