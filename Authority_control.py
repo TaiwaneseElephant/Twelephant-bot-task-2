@@ -40,7 +40,7 @@ def save(site, page, text:str, summary:str = "", add:bool = False, minor:bool = 
 
 def check_switch(site, switch_page_name:str) -> bool:
     switch_page = pywikibot.Page(site, switch_page_name)
-    return json.loads(switch_page.text)["Update pages need authority control template"]["Enable"]
+    return json.loads(switch_page.text)["Automatically add authority control template"]["Enable"]
 
 def has_authority_control(page, AUTHORITY_CONTROL_ID:tuple) -> bool:
     try:
