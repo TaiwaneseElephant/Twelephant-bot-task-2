@@ -61,10 +61,12 @@ def has_authority_control(page) -> bool:
 def add_authority_control_template(page) -> None:
     text = page.get(force = True)
     match = BOTTOM_PATTERN.search(text)
-    if match != None:
+    if match == None:
+        save(site, page, "\n{{Authority control}}", "根據維基數據資料添加[[Template:Authority control|權威控制模板]]", add = True)
+    else:
         place = match.start()
         text = f"{text[:place]}\n{{{{Authority control}}}}\n{text[place:]}"
-    save(site, page, text, "根據維基數據資料添加[[Template:Authority control|權威控制模板]]")
+        save(site, page, text, "根據維基數據資料添加[[Template:Authority control|權威控制模板]]")
 
 def need_authority_control_template(page) -> bool:
     if page.isRedirectPage():
