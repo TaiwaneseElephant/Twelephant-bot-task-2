@@ -68,7 +68,7 @@ def add_authority_control_template(page):
 def need_authority_control_template(page, AUTHORITY_CONTROL_ID:tuple) -> bool:
     if page.isRedirectPage():
         return False
-    text = page.text
+    text = page.get(force = True)
     for i in ("{{Authority control", "{{authority control", "{{規範控制", "{{规范控制", "{{權威控制", "{{权威控制"):
         if i in text:
             return False
