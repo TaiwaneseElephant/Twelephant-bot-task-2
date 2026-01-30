@@ -15,7 +15,7 @@ def save(site, page, text:str, summary:str = "", add:bool = False, minor:bool = 
     for _ in range(max_retry_times):
         try:
             if add and page.exists():
-                page.text = oringinal_text + text
+                page.text = textlib.add_text(oringinal_text, text, site = site)
             else:
                 page.text = text
             page.save(summary, minor = minor)
@@ -57,14 +57,10 @@ def has_authority_control(page, AUTHORITY_CONTROL_ID:tuple) -> bool:
 def need_authority_control_template(page, AUTHORITY_CONTROL_ID:tuple) -> bool:
     if page.isRedirectPage():
         return False
-    if has_authority_control(page, AUTHORITY_CONTROL_ID):
-        text = page.text
-        for i in ("{{Authority control", "{{authority control", "{{規範控制", "{{规范控制", "{{權威控制", "{{权威控制"):
-            if i in text:
-                return False
-        return True
-    else:
-        return False
+    for i in ("{{Authority control", "{{authority control", "{{規範控制", "{{规范控制", "{{權威控制", "{{权威控制"):
+        if i in text:
+            return False
+    return has_authority_control(page, AUTHORITY_CONTROL_ID):
 
 if __name__ == "__main__":
     site = pywikibot.Site("wikipedia:zh")
@@ -76,7 +72,7 @@ if __name__ == "__main__":
         assert isinstance(viewed, list) and isinstance(log, list)
         viewed = set(viewed)
     except:
-        viewed = {}
+        viewed = set()
         log = []
     for page in pagegenerators.AllpagesPageGenerator(site):
         title = page.title()
