@@ -94,7 +94,8 @@ def main():
         if need_authority_control_template(page) and page.botMayEdit():
             add_authority_control_template(page)
             log.append(title)
-            save(site, log_json, json.dumps(log), "Update log")
+            if len(log) % 50 == 0:
+                save(site, log_json, json.dumps(log), "Update log")
             if not check_switch(site, "User:Twelephant-bot/setting.json"):
                 break
         viewed.add(title)
