@@ -8,6 +8,8 @@ AUTHORITY_CONTROL_ID = {268, 214, 7859, 3372, 6804, 1907, 4186, 2092, 1908, 1707
                         3065, 781, 1362, 691, 1890, 950, 9984, 3348, 1375, 8189, 1736, 396, 3863, 1986, 8034, 349, 271, 5034, 1368, 651, 1006, 650, 350, 1695, 7293, 1003, \
                         947, 906, 5587, 7314, 1048, 2558}
 
+BOTTOM_PATTERN = re.compile(r"\[\[\s(?:[Cc]at|[Cc]atgory):.*?\s\]\]|(?:\{\{\s(?:DEFAULTSORT:.*?|[Ss]tub(?:\|.*?)?|.*?-stub(?:\|.*?)?|.*?小作品(?:\|.*?)?|小條目(?:\|.*?)?)\s\}\})", flag = re.DOTALL)
+
 def save(site, page, text:str, summary:str = "", add:bool = False, minor:bool = True, max_retry_times:int = 3):
     e = None
     oringinal_text = ""
@@ -56,11 +58,14 @@ def has_authority_control(page, AUTHORITY_CONTROL_ID:tuple) -> bool:
     return False
 
 def add_authority_control_template(page):
-    text_list = page.text.split("\n")[::-1]
+    text = page.text
     place = 0
-    for i in range(len(text_list)):
-        if re.findall(r"(?:\{\{DEFAULTSORT:|\[\[(?:[Cc]at|[Cc]atgory):.*?\]\]|\{\{[Ss]tub|\{\{.*?-stub|\{\{.*?小作品|\{\{小條目)", text_list[i+1].replace(" ", "")):
-          place = i+2
+    temp = []
+    find = BOTTOM_PATTERN.findall(text.replace(" ", "").replace("\n", ""))
+    text = re
+    if find != None:
+        find.group()
+        place = i+2
     text_list.insert(place, "{{Authority control}}")
     text = "\n".join(text_list[::-1])
     save(site, page, text, "根據維基數據資料添加[[Template:Authority control|權威控制模板]]")
