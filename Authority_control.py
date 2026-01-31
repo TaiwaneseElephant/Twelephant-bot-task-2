@@ -103,20 +103,21 @@ def main():
                 temp = json.load(f)
             assert isinstance(temp, dict)
             all_viewed = {}
+            viewed = set()
             for i in temp:
                 try:
                     if datetime.utcnow() - datetime.strptime(i, "%y-%m-%d") < datetime.timedelta(days = 30):
                         all_viewed[i] = temp[i]
+                        viewed.update(temp[i])
                 except:
                     pass
             del temp
-            viewed = set(all_viewed.values())
         except:
             all_viewed = {}
-            viewed = set(log)
+            viewed = set()
     else:
         all_viewed = {}
-        viewed = set(log)
+        viewed = set()
     new_viewed = []
     for page in pagegenerators.AllpagesPageGenerator(site = site, namespaces = 0, filterredir = False):
         title = page.title()
@@ -132,10 +133,10 @@ def main():
         viewed.add(title)
         new_viewed.append(title)
         if len(new_viewed) == 50:
-            if datetime.utcnow().strftime("%y-$m-%d") in all_viewed:
-                all_viewed[datetime.utcnow().strftime("%y-$m-%d")].extend(new_viewed)
+            if datetime.utcnow().strftime("%y-%m-%d") in all_viewed:
+                all_viewed[datetime.utcnow().strftime("%y-%m-%d")].extend(new_viewed)
             else:
-                all_viewed[datetime.utcnow().strftime("%y-$m-%d")] = new_viewed
+                all_viewed[datetime.utcnow().strftime("%y-%m-%d")] = new_viewed
             with open("task-2-viewed-temp.json", "w", encoding = "utf-8") as f:
                 json.dump(all_viewed, f)
             new_viewed = []
