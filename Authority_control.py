@@ -3,6 +3,7 @@ import pywikibot
 from pywikibot import pagegenerators, textlib
 import json
 import re
+import os.path
 
 AUTHORITY_CONTROL_ID = {
   268, 214, 7859, 3372, 6804, 1907, 4186, 2092, 1908, 1707, 6829, 2349, 6792, 227, 1960, 347, 1248, 244, 1225, 2041, 409, 2750, 650, 350, 781, \
@@ -91,12 +92,15 @@ def main():
         assert isinstance(log, list)
     except:
         log = []
-    try:
-        with open("task-2-viewed.json", "r", encoding = "utf-8") as f:
-            viewed = json.load(f)
-        assert isinstance(viewed, list) and isinstance(log, list)
-        viewed = set(viewed) | set(log)
-    except:
+    if os.path.exists("task-2-viewed.json"):
+        try:
+            with open("task-2-viewed.json", "r", encoding = "utf-8") as f:
+                viewed = json.load(f)
+            assert isinstance(viewed, list) and isinstance(log, list)
+            viewed = set(viewed) | set(log)
+        except:
+            viewed = set(log)
+    else:
         viewed = set(log)
     for page in pagegenerators.AllpagesPageGenerator(site = site, namespaces = 0, filterredir = False):
         title = page.title()
