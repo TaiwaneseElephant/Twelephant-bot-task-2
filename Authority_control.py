@@ -104,7 +104,7 @@ def main():
             assert isinstance(all_viewed, dict)
             for i in all_viewed:
                 try:
-                    if datetime.strptime(i, "%y-%m-%d") - datetime.utcnow()	< datetime.timedelta(days = 30):
+                    if datetime.utcnow() - datetime.strptime(i, "%y-%m-%d") < datetime.timedelta(days = 30):
                         del all_viewed[i]
                 except:
                     del all_viewed[i]
