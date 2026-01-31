@@ -3,6 +3,7 @@ import pywikibot
 from pywikibot import pagegenerators, textlib
 import json
 import re
+import os
 import os.path
 
 AUTHORITY_CONTROL_ID = {
@@ -115,8 +116,9 @@ def main():
                 break
         viewed.add(title)
         if len(viewed) % 50 == 0:
-            with open("task-2-viewed.json", "w", encoding = "utf-8") as f:
+            with open("task-2-viewed-temp.json", "w", encoding = "utf-8") as f:
                 json.dump(list(viewed), f)
+            os.replace("task-2-viewed-temp.json", "task-2-viewed.json")
             if not check_switch(site, "User:Twelephant-bot/setting.json"):
                 break
     save(site, viewed_json, "[]", "Clean up")
