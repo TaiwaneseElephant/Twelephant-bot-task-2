@@ -108,7 +108,7 @@ def main():
             viewed = set()
             for i in temp:
                 try:
-                    if datetime.utcnow() - datetime.strptime(i, "%y-%m-%d") < timedelta(days = 30):
+                    if datetime.utcnow() - datetime.strptime(i, "%Y-%m-%d") < timedelta(days = 30):
                         all_viewed[i] = temp[i]
                         viewed.update(temp[i])
                 except:
@@ -141,7 +141,7 @@ def main():
         viewed.add(title)
         new_viewed.append(title)
         if len(new_viewed) == 50:
-            time_now = datetime.utcnow().strftime("%y-%m-%d")
+            time_now = datetime.utcnow().strftime("%Y-%m-%d")
             if time_now in all_viewed:
                 all_viewed[time_now].extend(new_viewed)
             else:
