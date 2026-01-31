@@ -5,7 +5,7 @@ import json
 import re
 import os
 import os.path
-from datetime import datetime, timedelta
+import datetime
 
 AUTHORITY_CONTROL_ID = {
   268, 214, 7859, 3372, 6804, 1907, 4186, 2092, 1908, 1707, 6829, 2349, 6792, 227, 1960, 347, 1248, 244, 1225, 2041, 409, 2750, 650, 350, 781, \
@@ -108,7 +108,7 @@ def main(limit:int = float("inf")):
             viewed = set()
             for i in temp:
                 try:
-                    if datetime.now(datetime.UTC) - datetime.strptime(i, "%Y-%m-%d") < timedelta(days = 30):
+                    if datetime.datetime.now(datetime.UTC) - datetime.datetime.strptime(i, "%Y-%m-%d") < datetime.timedelta(days = 30):
                         all_viewed[i] = temp[i]
                         viewed.update(temp[i])
                 except:
@@ -142,7 +142,7 @@ def main(limit:int = float("inf")):
         viewed.add(title)
         new_viewed.append(title)
         if len(new_viewed) == 50:
-            time_now = datetime.now(datetime.UTC).strftime("%Y-%m-%d")
+            time_now = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d")
             if time_now in all_viewed:
                 all_viewed[time_now].extend(new_viewed)
             else:
