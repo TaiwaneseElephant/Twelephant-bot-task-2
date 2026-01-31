@@ -121,7 +121,8 @@ def main():
             os.replace("task-2-viewed-temp.json", "task-2-viewed.json")
             if not check_switch(site, "User:Twelephant-bot/setting.json"):
                 break
-    save(site, viewed_json, "[]", "Clean up")
+    with open("task-2-viewed.json", "w", encoding = "utf-8"):
+        pass
 
 if __name__ == "__main__":
     main()
