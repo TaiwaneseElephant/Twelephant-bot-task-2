@@ -89,7 +89,7 @@ def need_authority_control_template(page) -> bool:
     else:
         return has_authority_control(page)
 
-def main(limit:int = inf):
+def main(limit:int = float("inf"):
     site = pywikibot.Site("wikipedia:zh")
     if not check_switch(site, "User:Twelephant-bot/setting.json"):
         return
@@ -127,7 +127,7 @@ def main(limit:int = inf):
         all_viewed = {}
         viewed = set()
     new_viewed = []
-    for page in pagegenerators.AllpagesPageGenerator(site = site, namespaces = 0, filterredir = False):
+    for page in pagegenerators.AllpagesPageGenerator(site = site, namespace = 0, filterredir = False):
         title = page.title()
         if title in viewed:
             continue
