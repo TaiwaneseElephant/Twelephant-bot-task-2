@@ -86,15 +86,18 @@ def need_authority_control_template(page) -> bool:
 def main():
     site = pywikibot.Site("wikipedia:zh")
     log_json = pywikibot.Page(site, "User:Twelephant-bot/task/2/log.json")
-    viewed_json = pywikibot.Page(site, "User:Twelephant-bot/task/2/viewed.json")
     try:
-        viewed = json.loads(viewed_json.text)
         log = json.loads(log_json.text)
+        assert isinstance(log, list)
+    except:
+        log = []
+    try:
+        with open("task-2-viewed.json", "r", encoding = "utf-8") as f:
+            viewed = json.load(f)
         assert isinstance(viewed, list) and isinstance(log, list)
         viewed = set(viewed) | set(log)
     except:
-        viewed = set()
-        log = []
+        viewed = set(log)
     for page in pagegenerators.AllpagesPageGenerator(site = site, namespaces = 0, filterredir = False):
         title = page.title()
         if title in viewed:
@@ -108,7 +111,8 @@ def main():
                 break
         viewed.add(title)
         if len(viewed) % 50 == 0:
-            save(site, viewed_json, json.dumps(list(viewed)), "Update record")
+            with open("task-2-viewed.json", "w", encoding = "utf-8") as f:
+                json.dump(list(viewed), f)
             if not check_switch(site, "User:Twelephant-bot/setting.json"):
                 break
     save(site, viewed_json, "[]", "Clean up")
