@@ -127,7 +127,7 @@ def main():
             add_authority_control_template(site, page)
             log.append(title)
             if len(log) % 50 == 0:
-                save(site, log_json, json.dumps(log), "Update log")
+                save(site, log_json, json.dumps(log, ensure_ascii = False), "Update log")
             if not check_switch(site, "User:Twelephant-bot/setting.json"):
                 break
         viewed.add(title)
@@ -139,7 +139,7 @@ def main():
             else:
                 all_viewed[time_now] = new_viewed
             with open("task-2-viewed-temp.json", "w", encoding = "utf-8") as f:
-                json.dump(all_viewed, f)
+                json.dump(all_viewed, f, ensure_ascii = False)
             new_viewed = []
             os.replace("task-2-viewed-temp.json", "task-2-viewed.json")
             if not check_switch(site, "User:Twelephant-bot/setting.json"):
