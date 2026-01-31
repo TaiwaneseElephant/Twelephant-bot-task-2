@@ -67,7 +67,7 @@ def has_authority_control(page) -> bool:
 def add_authority_control_template(site, page) -> None:
     text = page.get(force = True)
     match = BOTTOM_PATTERN.search(text)
-    if match == None:
+    if match is None:
         save(site, page, "\n{{Authority control}}", "根據維基數據資料添加[[Template:Authority control|權威控制模板]]", add = True)
     else:
         place = match.start()
