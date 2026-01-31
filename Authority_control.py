@@ -5,6 +5,7 @@ import json
 import re
 import os
 import os.path
+from datetime import datetime, timedelta
 
 AUTHORITY_CONTROL_ID = {
   268, 214, 7859, 3372, 6804, 1907, 4186, 2092, 1908, 1707, 6829, 2349, 6792, 227, 1960, 347, 1248, 244, 1225, 2041, 409, 2750, 650, 350, 781, \
@@ -99,13 +100,22 @@ def main():
     if os.path.exists("task-2-viewed.json"):
         try:
             with open("task-2-viewed.json", "r", encoding = "utf-8") as f:
-                viewed = json.load(f)
-            assert isinstance(viewed, list) and isinstance(log, list)
-            viewed = set(viewed) | set(log)
+                all_viewed = json.load(f)
+            assert isinstance(all_viewed, dict)
+            for i in all_viewed:
+                try:
+                    if datetime.strptime(i, "%y-%m-%d") - datetime.utcnow()	< datetime.timedelta(days = 30):
+                        del all_viewed[i]
+                except:
+                    del all_viewed[i]
+            viewed = set(all_viewed.values())
         except:
+            all_viewed = {}
             viewed = set(log)
     else:
+        all_viewed = {}
         viewed = set(log)
+    new_viewed = []
     for page in pagegenerators.AllpagesPageGenerator(site = site, namespaces = 0, filterredir = False):
         title = page.title()
         if title in viewed:
@@ -118,9 +128,15 @@ def main():
             if not check_switch(site, "User:Twelephant-bot/setting.json"):
                 break
         viewed.add(title)
-        if len(viewed) % 50 == 0:
+        new_viewed.append(title)
+        if len(new_viewed) == 50:
+            if datetime.utcnow().strftime("y-$m-%d") in all_viewed:
+                all_viewed[datetime.utcnow().strftime("y-$m-%d")].extend(new_viewed)
+            else:
+                all_viewed[datetime.utcnow().strftime("y-$m-%d")] = new_viewed
             with open("task-2-viewed-temp.json", "w", encoding = "utf-8") as f:
-                json.dump(list(viewed), f)
+                json.dump(all_viewed, f)
+            new_viewed = []
             os.replace("task-2-viewed-temp.json", "task-2-viewed.json")
             if not check_switch(site, "User:Twelephant-bot/setting.json"):
                 break
