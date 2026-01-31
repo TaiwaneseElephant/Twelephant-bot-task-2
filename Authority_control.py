@@ -75,7 +75,7 @@ def need_authority_control_template(page) -> bool:
     for i in ("{{Authority control", "{{authority control", "{{規範控制", "{{规范控制", "{{權威控制", "{{权威控制"):
         if i in text:
             return False
-    return has_authority_control(page, AUTHORITY_CONTROL_ID)
+    return has_authority_control(page)
 
 def main():
     site = pywikibot.Site("wikipedia:zh")
