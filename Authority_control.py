@@ -60,7 +60,7 @@ def has_authority_control(page) -> bool:
         pass
     return False
 
-def add_authority_control_template(page) -> None:
+def add_authority_control_template(site, page) -> None:
     text = page.get(force = True)
     match = BOTTOM_PATTERN.search(text)
     if match == None:
@@ -87,7 +87,7 @@ def main():
         viewed = json.loads(viewed_json.text)
         log = json.loads(log_json.text)
         assert isinstance(viewed, list) and isinstance(log, list)
-        viewed = set(viewed + log)
+        viewed = set(viewed) | set(log)
     except:
         viewed = set()
         log = []
@@ -96,7 +96,7 @@ def main():
         if title in viewed:
             continue
         if need_authority_control_template(page) and page.botMayEdit():
-            add_authority_control_template(page)
+            add_authority_control_template(site, page)
             log.append(title)
             if len(log) % 50 == 0:
                 save(site, log_json, json.dumps(log), "Update log")
