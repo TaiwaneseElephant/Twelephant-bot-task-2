@@ -87,7 +87,7 @@ def main():
         viewed = json.loads(viewed_json.text)
         log = json.loads(log_json.text)
         assert isinstance(viewed, list) and isinstance(log, list)
-        viewed = set(viewed)
+        viewed = set(viewed + log)
     except:
         viewed = set()
         log = []
