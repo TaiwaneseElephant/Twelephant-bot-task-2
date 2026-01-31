@@ -133,10 +133,11 @@ def main():
         viewed.add(title)
         new_viewed.append(title)
         if len(new_viewed) == 50:
-            if datetime.utcnow().strftime("%y-%m-%d") in all_viewed:
-                all_viewed[datetime.utcnow().strftime("%y-%m-%d")].extend(new_viewed)
+            time_now = datetime.utcnow().strftime("%y-%m-%d")
+            if time_now in all_viewed:
+                all_viewed[time_now].extend(new_viewed)
             else:
-                all_viewed[datetime.utcnow().strftime("%y-%m-%d")] = new_viewed
+                all_viewed[time_now] = new_viewed
             with open("task-2-viewed-temp.json", "w", encoding = "utf-8") as f:
                 json.dump(all_viewed, f)
             new_viewed = []
