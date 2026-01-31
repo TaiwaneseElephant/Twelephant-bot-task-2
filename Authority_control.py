@@ -89,7 +89,7 @@ def need_authority_control_template(page) -> bool:
     else:
         return has_authority_control(page)
 
-def main(limit:int = float("inf"):
+def main(limit:int = float("inf")):
     site = pywikibot.Site("wikipedia:zh")
     if not check_switch(site, "User:Twelephant-bot/setting.json"):
         return
