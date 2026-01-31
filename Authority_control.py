@@ -100,14 +100,16 @@ def main():
     if os.path.exists("task-2-viewed.json"):
         try:
             with open("task-2-viewed.json", "r", encoding = "utf-8") as f:
-                all_viewed = json.load(f)
-            assert isinstance(all_viewed, dict)
-            for i in all_viewed:
+                temp = json.load(f)
+            assert isinstance(temp, dict)
+            all_viewed = {}
+            for i in temp:
                 try:
                     if datetime.utcnow() - datetime.strptime(i, "%y-%m-%d") < datetime.timedelta(days = 30):
-                        del all_viewed[i]
+                        all_viewed[i] = temp[i]
                 except:
-                    del all_viewed[i]
+                    pass
+            del temp
             viewed = set(all_viewed.values())
         except:
             all_viewed = {}
@@ -130,10 +132,10 @@ def main():
         viewed.add(title)
         new_viewed.append(title)
         if len(new_viewed) == 50:
-            if datetime.utcnow().strftime("y-$m-%d") in all_viewed:
-                all_viewed[datetime.utcnow().strftime("y-$m-%d")].extend(new_viewed)
+            if datetime.utcnow().strftime("%y-$m-%d") in all_viewed:
+                all_viewed[datetime.utcnow().strftime("%y-$m-%d")].extend(new_viewed)
             else:
-                all_viewed[datetime.utcnow().strftime("y-$m-%d")] = new_viewed
+                all_viewed[datetime.utcnow().strftime("%y-$m-%d")] = new_viewed
             with open("task-2-viewed-temp.json", "w", encoding = "utf-8") as f:
                 json.dump(all_viewed, f)
             new_viewed = []
