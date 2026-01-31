@@ -91,6 +91,8 @@ def need_authority_control_template(page) -> bool:
 
 def main():
     site = pywikibot.Site("wikipedia:zh")
+    if not check_switch(site, "User:Twelephant-bot/setting.json"):
+        return
     log_json = pywikibot.Page(site, "User:Twelephant-bot/task/2/log.json")
     try:
         log = json.loads(log_json.text)
@@ -112,6 +114,12 @@ def main():
                 except:
                     pass
             del temp
+            try:
+                with open("task-2-viewed-temp.json", "w", encoding = "utf-8") as f:
+                    json.dump(all_viewed, f, ensure_ascii = False)
+                os.replace("task-2-viewed-temp.json", "task-2-viewed.json")
+            except:
+                pass
         except:
             all_viewed = {}
             viewed = set()
