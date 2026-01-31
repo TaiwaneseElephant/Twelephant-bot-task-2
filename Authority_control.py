@@ -54,8 +54,11 @@ def has_authority_control(page) -> bool:
         repo = item.repo
         claims = item.get().get("claims", {})
         for prop_id in claims:
-            if  int(prop_id[1:]) in AUTHORITY_CONTROL_ID:
-                return True
+            try:
+                if  int(prop_id[1:]) in AUTHORITY_CONTROL_ID:
+                    return True
+            except:
+                pass
     except pywikibot.exceptions.NoPageError:
         pass
     return False
