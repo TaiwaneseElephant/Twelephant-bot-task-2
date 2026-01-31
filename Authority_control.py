@@ -89,7 +89,7 @@ def need_authority_control_template(page) -> bool:
     else:
         return has_authority_control(page)
 
-def main():
+def main(limit:int = inf):
     site = pywikibot.Site("wikipedia:zh")
     if not check_switch(site, "User:Twelephant-bot/setting.json"):
         return
@@ -134,8 +134,9 @@ def main():
         if need_authority_control_template(page) and page.botMayEdit():
             add_authority_control_template(site, page)
             log.append(title)
-            if len(log) % 50 == 0:
-                save(site, log_json, json.dumps(log, ensure_ascii = False), "Update log")
+            save(site, log_json, json.dumps(log, ensure_ascii = False), "Update log")
+            if len(log) >= limit:
+                break
             if not check_switch(site, "User:Twelephant-bot/setting.json"):
                 break
         viewed.add(title)
