@@ -14,7 +14,7 @@ AUTHORITY_CONTROL_ID = {
   947, 906, 5587, 7314, 1048, 2558
 }
 
-BOTTOM_PATTERN = re.compile(r"\[\[\s*(?:[Cc]at|[Cc]ategory):.*?\s*\]\]|(?:\{\{\s*(?:[Tt](?:emplate)?:)?\s*(?:DEFAULTSORT:.*?|[Ss]tub(?:\|.*?)?|.*?-stub(?:\|.*?)?|.*?小作品(?:\|.*?)?|小條目(?:\|.*?)?)\s*\}\})", flags = re.DOTALL)
+BOTTOM_PATTERN = re.compile(r"\{\{\s*(?:[Tt](?:emplate)?:)?\s*(?:DEFAULTSORT:.*?|[Ss]tub(?:\|.*?)?|.*?-stub(?:\|.*?)?|.*?小作品(?:\|.*?)?|小條目(?:\|.*?)?)\s*\}\}", flags = re.DOTALL)
 AUTHORITY_CONTROL_TEMPLATE_PATTERN = re.compile(r"\{\{\s*(?:[Tt](?:emplate)?:)?\s*(?:[Aa]uthority [Cc]ontrol|[Aa]c|[Aa]utC|[規规][範范]控制|[權权]威控制|[Nn]ormdaten)(?:\|.*?)?\s*\}\}", flags = re.DOTALL)
 
 def save(site, page, text:str, summary:str = "", add:bool = False, minor:bool = True, max_retry_times:int = 3):
@@ -76,8 +76,11 @@ def add_authority_control_template(site, page) -> None:
     if match is None:
         save(site, page, "\n{{Authority control}}", "根據維基數據資料添加[[Template:Authority control|權威控制模板]]", add = True)
     else:
+        cats = textlib.getCategoryLinks(text, site)
+        text = textlib.removeCategoryLinks(text, site
         place = match.start()
         text = f"{text[:place].rstrip()}\n{{{{Authority control}}}}\n{text[place:].lstrip()}"
+        text = textlib.replaceCategoryLinks(text, cats, site, add_only = True)
         save(site, page, text, "根據維基數據資料添加[[Template:Authority control|權威控制模板]]")
 
 def need_authority_control_template(page) -> bool:
