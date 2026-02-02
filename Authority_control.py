@@ -77,7 +77,7 @@ def add_authority_control_template(site, page) -> None:
         save(site, page, "\n{{Authority control}}", "根據維基數據資料添加[[Template:Authority control|權威控制模板]]", add = True)
     else:
         cats = textlib.getCategoryLinks(text, site)
-        text = textlib.removeCategoryLinks(text, site
+        text = textlib.removeCategoryLinks(text, site)
         place = match.start()
         text = f"{text[:place].rstrip()}\n{{{{Authority control}}}}\n{text[place:].lstrip()}"
         text = textlib.replaceCategoryLinks(text, cats, site, add_only = True)
