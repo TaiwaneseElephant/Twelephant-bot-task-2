@@ -72,16 +72,13 @@ def has_authority_control(page) -> bool:
 
 def add_authority_control_template(site, page) -> None:
     text = page.get(force = True)
-    match = BOTTOM_PATTERN.search(text)
-    if match is None:
-        save(site, page, "\n{{Authority control}}", "根據維基數據資料添加[[Template:Authority control|權威控制模板]]", add = True)
-    else:
-        cats = textlib.getCategoryLinks(text, site)
-        text = textlib.removeCategoryLinks(text, site)
-        place = match.start()
-        text = f"{text[:place].rstrip()}\n{{{{Authority control}}}}\n{text[place:].lstrip()}"
-        text = textlib.replaceCategoryLinks(text, cats, site, add_only = True)
-        save(site, page, text, "根據維基數據資料添加[[Template:Authority control|權威控制模板]]")
+    cats = textlib.getCategoryLinks(text, site)
+    text = textlib.removeCategoryLinks(text, site)
+    match = BOTTOM_PATTERN.findall(text)
+    text = BOTTOM_PATTERN.sub("", text)
+    text = f"{text.rstrip()}\n{{{{Authority control}}}}\n{'\n'.join(match)}"
+    text = textlib.replaceCategoryLinks(text, cats, site, add_only = True)
+    save(site, page, text, "根據維基數據資料添加[[Template:Authority control|權威控制模板]]")
 
 def need_authority_control_template(page) -> bool:
     if page.isRedirectPage():
