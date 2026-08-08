@@ -6,6 +6,7 @@ import re
 import os
 import os.path
 import datetime
+import time
 
 AUTHORITY_CONTROL_ID = {
   268, 214, 7859, 3372, 6804, 1907, 4186, 2092, 1908, 1707, 6829, 2349, 6792, 227, 1960, 347, 1248, 244, 1225, 2041, 409, 2750, 650, 350, 781, \
@@ -153,6 +154,7 @@ def main(limit:int = float("inf")):
             os.replace("task-2-viewed-temp.json", "task-2-viewed.json")
             if not check_switch(site, "User:Twelephant-bot/setting.json"):
                 break
+        time.sleep(10)
 
 if __name__ == "__main__":
     main()
