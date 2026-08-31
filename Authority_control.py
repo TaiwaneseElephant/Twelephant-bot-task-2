@@ -29,7 +29,7 @@ def save(site, page, text:str, summary:str = "", add:bool = False, minor:bool = 
                 page.text = textlib.add_text(oringinal_text, text, site = site)
             else:
                 page.text = text
-            page.save(summary, minor = minor)
+            page.save(summary, minor = minor, bot=True)
             return True
         except pywikibot.exceptions.EditConflictError as e:
             print(f"Warning! There is an edit conflict on page '{page.title()}'!")
@@ -79,7 +79,7 @@ def add_authority_control_template(site, page) -> None:
     text = BOTTOM_PATTERN.sub("", text)
     text = f"{text.rstrip()}\n{{{{Authority control}}}}\n{'\n'.join(match)}"
     text = textlib.replaceCategoryLinks(text, cats, site, add_only = True)
-    save(site, page, text, "根據維基數據資料添加[[Template:Authority control|權威控制模板]]")
+    return save(site, page, text, "根據維基數據資料添加[[Template:Authority control|權威控制模板]]")
 
 def need_authority_control_template(page) -> bool:
     if page.isRedirectPage():
@@ -94,12 +94,7 @@ def main(limit:int = float("inf")):
     site = pywikibot.Site("wikipedia:zh")
     if not check_switch(site, "User:Twelephant-bot/setting.json"):
         return
-    log_json = pywikibot.Page(site, "User:Twelephant-bot/task/2/log.json")
-    try:
-        log = json.loads(log_json.text)
-        assert isinstance(log, list)
-    except:
-        log = []
+    log = []
     if os.path.exists("task-2-viewed.json"):
         try:
             with open("task-2-viewed.json", "r", encoding = "utf-8") as f:
@@ -112,15 +107,15 @@ def main(limit:int = float("inf")):
                     if datetime.datetime.now(datetime.UTC).replace(tzinfo=None) - datetime.datetime.strptime(i, "%Y-%m-%d") < datetime.timedelta(days = 30):
                         all_viewed[i] = temp[i]
                         viewed.update(temp[i])
-                except:
-                    pass
+                except Exception as e:
+                    print(f"Failed to update all_viewed set, title: {temp[i]}, error:{e}")
             del temp
             try:
                 with open("task-2-viewed-temp.json", "w", encoding = "utf-8") as f:
                     json.dump(all_viewed, f, ensure_ascii = False)
                 os.replace("task-2-viewed-temp.json", "task-2-viewed.json")
-            except:
-                pass
+            except Exception as e:
+                print(f"Failed to update task-2-viewed.json, content:\n{all_viewed}, error:{e}")
         except:
             all_viewed = {}
             viewed = set()
@@ -133,9 +128,10 @@ def main(limit:int = float("inf")):
         if title in viewed:
             continue
         if need_authority_control_template(page) and page.botMayEdit():
-            add_authority_control_template(site, page)
+            success = add_authority_control_template(site, page)
+            if not success:
+              continue
             log.append(title)
-            save(site, log_json, json.dumps(log, ensure_ascii = False), "Update log")
             if len(log) >= limit:
                 break
             if not check_switch(site, "User:Twelephant-bot/setting.json"):
