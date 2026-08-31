@@ -117,7 +117,7 @@ def main(limit:int = float("inf")):
         viewed = set()
     new_viewed = []
     query_string = (QUERY % " ".join(["wdt:P%d" % i for i in AUTHORITY_CONTROL_ID]))
-    for page in pagegenerators.WikidataSPARQLPageGenerato(query_string, site = site):
+    for page in pagegenerators.WikidataSPARQLPageGenerator(query_string, site = site):
         title = page.title()
         if title in viewed:
             continue
