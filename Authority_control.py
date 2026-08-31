@@ -15,7 +15,7 @@ AUTHORITY_CONTROL_ID = {
   947, 906, 5587, 7314, 1048, 2558
 }
 
-QUERY = '''SELECT DISTINCT ?item ?title where {
+QUERY = '''SELECT DISTINCT ?title where {
   VALUES ?property {%s}
   ?item ?property ?value .
   ?pages schema:about ?item;
