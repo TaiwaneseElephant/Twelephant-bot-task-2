@@ -15,31 +15,21 @@ AUTHORITY_CONTROL_ID = {
   947, 906, 5587, 7314, 1048, 2558
 }
 
-QUERY = '''SELECT DISTINCT ?title where {
-  VALUES ?property {%s}
-  ?item ?property ?value .
-  ?pages schema:about ?item;
-         schema:isPartOf <https://zh.wikipedia.org/> .
-  ?pages schema:name ?title .
-}
-LIMIT 500'''
-
 BOTTOM_PATTERN = re.compile(r"\{\{\s*(?:(?:[Tt](?:emplate)?|模板)\s*:)?\s*(?:DEFAULTSORT:.*?|[Ss]tub(?:\|.*?)?|.*?-stub(?:\|.*?)?|.*?小作品(?:\|.*?)?|小條目(?:\|.*?)?)\s*\}\}", flags = re.DOTALL)
 AUTHORITY_CONTROL_TEMPLATE_PATTERN = re.compile(r"\{\{\s*(?:(?:[Tt](?:emplate)?|模板)\s*:)?\s*(?:[Aa]uthority [Cc]ontrol|[Aa]c|[Aa]utC|[規规][範范]控制|[權权]威控制|[Nn]ormdaten)(?:\|.*?)?\s*\}\}", flags = re.DOTALL)
 
-def save(site, page, text:str, summary:str = "", add:bool = False, minor:bool = True, max_retry_times:int = 3):
+def save(site, page, text:str, summary:str = "", minor:bool = True, max_retry_times:int = 3):
     e = None
     oringinal_text = ""
-    if add and page.exists():
+    if page.exists():
         oringinal_text = page.get(force = True, get_redirect = True)
+    else:
+      return False
     for _ in range(max_retry_times):
         try:
-            if add and page.exists():
-                page.text = textlib.add_text(oringinal_text, text, site = site)
-            else:
-                page.text = text
-            if page.text == oringinal_text:
+            if text == oringinal_text:
               return False
+            page.text = text
             page.save(summary, minor = minor, bot=True)
             return True
         except pywikibot.exceptions.EditConflictError as e:
@@ -67,6 +57,21 @@ def check_switch(site, switch_page_name:str) -> bool:
     except:
         return False
 
+def has_authority_control(page) -> bool:
+    try:
+        item = pywikibot.ItemPage.fromPage(page)
+        repo = item.repo
+        claims = item.get().get("claims", {})
+        for prop_id in claims:
+            try:
+                if  int(prop_id[1:]) in AUTHORITY_CONTROL_ID:
+                    return True
+            except:
+                pass
+    except pywikibot.exceptions.NoPageError:
+        pass
+    return False
+
 def add_authority_control_template(site, page) -> None:
     text = page.get(force = True)
     cats = textlib.getCategoryLinks(text, site)
@@ -81,7 +86,10 @@ def need_authority_control_template(page) -> bool:
     if page.isRedirectPage():
         return False
     text = page.get(force = True)
-   return not AUTHORITY_CONTROL_TEMPLATE_PATTERN.search(text):
+    if AUTHORITY_CONTROL_TEMPLATE_PATTERN.search(text):
+        return False
+    else:
+        return has_authority_control(page)
 
 def main(limit:int = float("inf")):
     site = pywikibot.Site("wikipedia:zh")
@@ -116,8 +124,7 @@ def main(limit:int = float("inf")):
         all_viewed = {}
         viewed = set()
     new_viewed = []
-    query_string = (QUERY % " ".join(["wdt:P%d" % i for i in AUTHORITY_CONTROL_ID]))
-    for page in pagegenerators.WikidataSPARQLPageGenerator(query_string, site = site):
+    for page in pagegenerators.AllpagesPageGenerator(site = site, namespace = 0, filterredir = False):
         title = page.title()
         if title in viewed:
             continue
