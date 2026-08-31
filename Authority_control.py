@@ -109,7 +109,7 @@ def main(limit:int = float("inf")):
             viewed = set()
             for i in temp:
                 try:
-                    if datetime.datetime.now(datetime.UTC) - datetime.datetime.strptime(i, "%Y-%m-%d") < datetime.timedelta(days = 30):
+                    if datetime.datetime.now(datetime.UTC).replace(tzinfo=None) - datetime.datetime.strptime(i, "%Y-%m-%d") < datetime.timedelta(days = 30):
                         all_viewed[i] = temp[i]
                         viewed.update(temp[i])
                 except:
