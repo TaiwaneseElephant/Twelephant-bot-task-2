@@ -50,10 +50,10 @@ def save(site, page, text:str, summary:str = "", minor:bool = True, max_retry_ti
     print(f"The attempt to edit the page '{page.title()}' was stopped because of the error below:\n{e}\nThe edit is '{text[:100]}', and the summary is '{summary}'.")
     return False
 
-def check_switch(site, switch_page_name:str) -> bool:
+def check_switch(site) -> bool:
     try:
-        switch_page = pywikibot.Page(site, switch_page_name)
-        return json.loads(switch_page.text)["Automatically add authority control template"]["Enable"]
+        switch_page = pywikibot.Page(site, "User:Twelephant-bot/task/2/config.json")
+        return json.loads(switch_page.text)["Enable"]
     except:
         return False
 
@@ -92,9 +92,16 @@ def need_authority_control_template(page) -> bool:
         return has_authority_control(page)
 
 def main(limit:int = float("inf")):
+    global AUTHORITY_CONTROL_ID
     site = pywikibot.Site("wikipedia:zh")
-    if not check_switch(site, "User:Twelephant-bot/setting.json"):
+    try:
+      config = json.loads(pywikibot.Page(site, "User:Twelephant-bot/task/2/config.json").text)
+      AUTHORITY_CONTROL_ID = config["AUTHORITY_CONTROL_ID"]
+      if not config["Enable"]:
         return
+    except:
+      print("Failed to load config")
+      return
     log = []
     if os.path.exists("task-2-viewed.json"):
         try:
@@ -105,7 +112,7 @@ def main(limit:int = float("inf")):
             viewed = set()
             for i in temp:
                 try:
-                    if datetime.datetime.now(datetime.UTC).replace(tzinfo=None) - datetime.datetime.strptime(i, "%Y-%m-%d") < datetime.timedelta(days = 30):
+                    if datetime.datetime.now(datetime.UTC) - datetime.datetime.strptime(i, "%Y-%m-%d").replace(tzinfo=timezone.utc) < datetime.timedelta(days = 30):
                         all_viewed[i] = temp[i]
                         viewed.update(temp[i])
                 except Exception as e:
@@ -135,7 +142,7 @@ def main(limit:int = float("inf")):
             log.append(title)
             if len(log) >= limit:
                 break
-            if not check_switch(site, "User:Twelephant-bot/setting.json"):
+            if not check_switch(site):
                 break
         viewed.add(title)
         new_viewed.append(title)
@@ -149,7 +156,7 @@ def main(limit:int = float("inf")):
                 json.dump(all_viewed, f, ensure_ascii = False)
             new_viewed = []
             os.replace("task-2-viewed-temp.json", "task-2-viewed.json")
-            if not check_switch(site, "User:Twelephant-bot/setting.json"):
+            if not check_switch(site):
                 break
         time.sleep(10)
 
