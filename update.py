@@ -30,7 +30,7 @@ def main():
       time.sleep(6)
     pages = list(pages - set([page.title() for page in pwb.Page(site, template).embeddedin(namespaces =0)]))
     with open("pages_need_authority_control_template.json", "w") as f:
-        json.dump(pages, f, ensure_ascii=False, indent=4))
+        json.dump(pages, f, ensure_ascii=False, indent=4)
     time.sleep(2592000)
 
 main()
