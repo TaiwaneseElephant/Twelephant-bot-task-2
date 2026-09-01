@@ -83,20 +83,20 @@ def add_authority_control_template(site, page) -> None:
     return save(site, page, text, "根據維基數據資料添加[[Template:Authority control|權威控制模板]]")
 
 def need_authority_control_template(page) -> bool:
-    if page.isRedirectPage():
+    if page.isRedirectPage() or page.isDisambig():
         return False
-    text = page.get(force = True)
-    if AUTHORITY_CONTROL_TEMPLATE_PATTERN.search(text):
-        return False
-    else:
-        return has_authority_control(page)
+    for template in page.itertemplates(namespaces=10):
+      if template.title() == AUTHORITY_CONTROL_TEMPLATE:
+          return False
+    return has_authority_control(page)
 
 def main(limit:int = float("inf")):
-    global AUTHORITY_CONTROL_ID
+    global AUTHORITY_CONTROL_ID, AUTHORITY_CONTROL_TEMPLATE
     site = pywikibot.Site("wikipedia:zh")
     try:
       config = json.loads(pywikibot.Page(site, "User:Twelephant-bot/task/2/config.json").text)
-      AUTHORITY_CONTROL_ID = config["AUTHORITY_CONTROL_ID"]
+      AUTHORITY_CONTROL_ID = config["authority control id"]
+      AUTHORITY_CONTROL_TEMPLATE = config["template"]
       if not config["Enable"]:
         return
     except:
