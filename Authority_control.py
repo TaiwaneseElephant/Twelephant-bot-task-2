@@ -93,7 +93,8 @@ def main(limit:int = float("inf")):
       print("Failed to load config")
       return
     pages_have_template = set([page.title() for page in pwb.Page(site, "Template:Authority control").embeddedin(namespaces =0)])
-    pages_need_authority_control_template = set(json.loads(pwb.Page(site, updatepage).text)) - pages_have_template
+    with open("pages_need_authority_control_template.json", encoding="utf-8") as f:
+        pages_need_authority_control_template = set(json.load(f) - pages_have_template
     for title in pages_need_authority_control_template:
         page = pwb.Page(site, title)
         #if need_authority_control_template(page, AUTHORITY_CONTROL_TEMPLATE, AUTHORITY_CONTROL_ID) and page.botMayEdit():
