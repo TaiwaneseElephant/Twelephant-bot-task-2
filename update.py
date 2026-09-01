@@ -16,7 +16,7 @@ def main():
       if not config["Enable"]:
         return
     except:
-          print("Failed to load config")
+      print("Failed to load config.")
       return
     properties = (" ".join(["wdt:P%d" % i for i in AUTHORITY_CONTROL_ID]))
     SparqlQuery = sparql.SparqlQuery()
