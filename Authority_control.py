@@ -16,7 +16,6 @@ AUTHORITY_CONTROL_ID = {
 }
 
 BOTTOM_PATTERN = re.compile(r"\{\{\s*(?:(?:[Tt](?:emplate)?|模板)\s*:)?\s*(?:DEFAULTSORT:.*?|[Ss]tub(?:\|.*?)?|.*?-stub(?:\|.*?)?|.*?小作品(?:\|.*?)?|小條目(?:\|.*?)?)\s*\}\}", flags = re.DOTALL)
-AUTHORITY_CONTROL_TEMPLATE_PATTERN = re.compile(r"\{\{\s*(?:(?:[Tt](?:emplate)?|模板)\s*:)?\s*(?:[Aa]uthority [Cc]ontrol|[Aa]c|[Aa]utC|[規规][範范]控制|[權权]威控制|[Nn]ormdaten)(?:\|.*?)?\s*\}\}", flags = re.DOTALL)
 
 def save(site, page, text:str, summary:str = "", minor:bool = True, max_retry_times:int = 3):
     e = None
