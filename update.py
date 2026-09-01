@@ -12,8 +12,6 @@ def main():
       AUTHORITY_CONTROL_ID = config["authority control id"]
       query_string = config["query string"]
       query_limit = config["query limit"]
-      updatepage = config["updatepage"]
-      updatesummary = config["updatesummary"]
       if not config["Enable"]:
         return
     except:
@@ -30,9 +28,8 @@ def main():
       pages = pages or set([page["title"] for page in result])
       offset += limit
     pages = list(pages - set([page.title() for page in pwb.Page(site, template).embeddedin(namespaces =0)]))
-    log_page = pwb.Page(site, updatepage)
-    log_page.text = json.dumps(pages)
-    log_page.save(minor=True, bot=True, summary=updatesummary)
+    with open("pages_need_authority_control_template.json", "w") as f:
+        json.dump(pages, f, ensure_ascii=False, indent=4))
     time.sleep(2592000)
 
 main()
