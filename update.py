@@ -25,8 +25,9 @@ def main():
       result = SparqlQuery.query(query=query_string % (properties, query_limit, offset))
       if not result:
           break
-      pages = pages or set([page["title"] for page in result])
+      pages = pages or set(result)
       offset += limit
+      time.sleep(6)
     pages = list(pages - set([page.title() for page in pwb.Page(site, template).embeddedin(namespaces =0)]))
     with open("pages_need_authority_control_template.json", "w") as f:
         json.dump(pages, f, ensure_ascii=False, indent=4))
