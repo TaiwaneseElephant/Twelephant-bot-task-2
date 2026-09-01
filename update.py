@@ -20,7 +20,6 @@ def main():
       return
     properties = (" ".join(["wdt:P%d" % i for i in AUTHORITY_CONTROL_ID]))
     SparqlQuery = sparql.SparqlQuery()
-    site = pwb.Site("wikipedia:zh")
     result = SparqlQuery.query(query=QUERY % (propertie))
     pages = set([page["title"] for page in result])- set([page.title() for page in pwb.Page(site, template).embeddedin(namespaces =0)])
     log_page = pwb.Page(site, updatepage)
