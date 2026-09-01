@@ -11,7 +11,7 @@ def save(site, page, text:str, summary:str = "", minor:bool = True, max_retry_ti
     e = None
     oringinal_text = ""
     if page.exists():
-        oringinal_text = page.get(force = True, get_redirect = True)
+        oringinal_text = page.get(force = True, get_redirect = False)
     else:
       return False
     for _ in range(max_retry_times):
@@ -46,7 +46,7 @@ def check_switch(site) -> bool:
     except:
         return False
 
-def has_authority_control(page) -> bool:
+def has_authority_control(page, AUTHORITY_CONTROL_ID) -> bool:
     try:
         item = pywikibot.ItemPage.fromPage(page)
         repo = item.repo
@@ -61,7 +61,7 @@ def has_authority_control(page) -> bool:
         pass
     return False
 
-def add_authority_control_template(site, page) -> None:
+def add_authority_control_template(site, page, summary) -> None:
     text = page.get(force = True)
     cats = textlib.getCategoryLinks(text, site)
     text = textlib.removeCategoryLinks(text, site)
@@ -69,23 +69,23 @@ def add_authority_control_template(site, page) -> None:
     text = BOTTOM_PATTERN.sub("", text)
     text = f"{text.rstrip()}\n{{{{Authority control}}}}\n{'\n'.join(match)}"
     text = textlib.replaceCategoryLinks(text, cats, site, add_only = True)
-    return save(site, page, text, "根據維基數據資料添加[[Template:Authority control|權威控制模板]]")
+    return save(site, page, text, summary, True)
 
-def need_authority_control_template(page) -> bool:
+def need_authority_control_template(page, AUTHORITY_CONTROL_TEMPLATE, AUTHORITY_CONTROL_ID) -> bool:
     if page.isRedirectPage() or page.isDisambig():
         return False
     for template in page.itertemplates(namespaces=10):
       if template.title() == AUTHORITY_CONTROL_TEMPLATE:
           return False
-    return has_authority_control(page)
+    return has_authority_control(page, AUTHORITY_CONTROL_ID)
 
 def main(limit:int = float("inf")):
-    global AUTHORITY_CONTROL_ID, AUTHORITY_CONTROL_TEMPLATE
     site = pywikibot.Site("wikipedia:zh")
     try:
       config = json.loads(pywikibot.Page(site, "User:Twelephant-bot/task/2/config.json").text)
       AUTHORITY_CONTROL_ID = config["authority control id"]
       AUTHORITY_CONTROL_TEMPLATE = config["template"]
+      summary = config["summary"]
       if not config["Enable"]:
         return
     except:
@@ -96,8 +96,8 @@ def main(limit:int = float("inf")):
         title = page.title()
         if title in pages_has_template:
             continue
-        if need_authority_control_template(page) and page.botMayEdit():
-            success = add_authority_control_template(site, page)
+        if need_authority_control_template(page, AUTHORITY_CONTROL_TEMPLATE, AUTHORITY_CONTROL_ID) and page.botMayEdit():
+            success = add_authority_control_template(site, page, summary)
             if success:
                 print(title)
                 if not check_switch(site):
