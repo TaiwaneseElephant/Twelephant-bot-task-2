@@ -26,7 +26,7 @@ def main():
       if not result:
           break
       pages = pages or set(result)
-      offset += limit
+      offset += query_limit
       time.sleep(6)
     pages = list(pages - set([page.title() for page in pwb.Page(site, template).embeddedin(namespaces =0)]))
     with open("pages_need_authority_control_template.json", "w") as f:
