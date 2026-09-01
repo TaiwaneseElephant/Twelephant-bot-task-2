@@ -20,7 +20,7 @@ def main():
       return
     properties = (" ".join(["wdt:P%d" % i for i in AUTHORITY_CONTROL_ID]))
     SparqlQuery = sparql.SparqlQuery()
-    result = SparqlQuery.query(query=QUERY % (propertie))
+    result = SparqlQuery.query(query=query_string % properties)
     pages = set([page["title"] for page in result])- set([page.title() for page in pwb.Page(site, template).embeddedin(namespaces =0)])
     log_page = pwb.Page(site, updatepage)
     log_page.text = json.dumps(pages)
