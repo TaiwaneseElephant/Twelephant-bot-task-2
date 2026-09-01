@@ -98,11 +98,10 @@ def main(limit:int = float("inf")):
             continue
         if need_authority_control_template(page) and page.botMayEdit():
             success = add_authority_control_template(site, page)
-            if not success:
-              continue
-            if not check_switch(site):
-                break
-            time.sleep(10)
+            if success:
+                print(title)
+                if not check_switch(site):
+                    break
 
 if __name__ == "__main__":
     main()
