@@ -25,7 +25,7 @@ def main():
     pages = set([page["title"] for page in result])- set([page.title() for page in pwb.Page(site, template).embeddedin(namespaces =0)])
     log_page = pwb.Page(site, updatepage)
     log_page.text = json.dumps(pages)
-    log.save(minor=True, bot=True, summary=updatesummary)
+    log_page.save(minor=True, bot=True, summary=updatesummary)
     time.sleep(2592000)
 
 main()
