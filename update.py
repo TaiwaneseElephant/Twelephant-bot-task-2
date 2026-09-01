@@ -11,6 +11,7 @@ def main():
       template = config["template"]
       AUTHORITY_CONTROL_ID = config["authority control id"]
       query_string = config["query string"]
+      query_limit = config["limit"]
       updatepage = config["updatepage"]
       updatesummary = config["updatesummary"]
       if not config["Enable"]:
@@ -20,11 +21,15 @@ def main():
       return
     properties = (" ".join(["wdt:P%d" % i for i in AUTHORITY_CONTROL_ID]))
     SparqlQuery = sparql.SparqlQuery()
-    result = SparqlQuery.query(query=query_string % properties)
-    if not result:
-        print(f"query: {query_string % properties} \n result: {result}")
-        return
-    pages = list(set([page["title"] for page in result])- set([page.title() for page in pwb.Page(site, template).embeddedin(namespaces =0)]))
+    offset = 0
+    pages = set()
+    while True:
+      result = SparqlQuery.query(query=query_string % (properties, query_limit, offset))
+      if not result:
+          break
+      pages = pages or set([page["title"] for page in result])
+      offset += limit
+    pages = pages - set([page.title() for page in pwb.Page(site, template).embeddedin(namespaces =0)]))
     log_page = pwb.Page(site, updatepage)
     log_page.text = json.dumps(pages)
     log_page.save(minor=True, bot=True, summary=updatesummary)
