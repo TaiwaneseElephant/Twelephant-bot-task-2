@@ -11,7 +11,7 @@ def main():
       template = config["template"]
       AUTHORITY_CONTROL_ID = config["authority control id"]
       query_string = config["query string"]
-      query_limit = config["limit"]
+      query_limit = config["query limit"]
       updatepage = config["updatepage"]
       updatesummary = config["updatesummary"]
       if not config["Enable"]:
