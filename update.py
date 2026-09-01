@@ -5,9 +5,9 @@ import json
 import time
 
 def main():
-    site = pywikibot.Site("wikipedia:zh")
+    site = pwb.Site("wikipedia:zh")
     try:
-      config = json.loads(pywikibot.Page(site, "User:Twelephant-bot/task/2/config.json").text)
+      config = json.loads(pwb.Page(site, "User:Twelephant-bot/task/2/config.json").text)
       template = config["template"]
       AUTHORITY_CONTROL_ID = config["authority control id"]
       query_string = config["query string"]
