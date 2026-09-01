@@ -83,8 +83,8 @@ def main(limit:int = float("inf")):
     site = pwb.Site("wikipedia:zh")
     try:
       config = json.loads(pwb.Page(site, "User:Twelephant-bot/task/2/config.json").text)
-      AUTHORITY_CONTROL_ID = config["authority control id"]
-      AUTHORITY_CONTROL_TEMPLATE = config["template"]
+      #AUTHORITY_CONTROL_ID = config["authority control id"]
+      #AUTHORITY_CONTROL_TEMPLATE = config["template"]
       updatepage = config["updatepage"]
       summary = config["summary"]
       if not config["Enable"]:
@@ -96,7 +96,8 @@ def main(limit:int = float("inf")):
     pages_need_authority_control_template = set(json.loads(pwb.Page(site, updatepage).text)) - pages_have_template
     for title in pages_need_authority_control_template:
         page = pwb.Page(site, title)
-        if need_authority_control_template(page, AUTHORITY_CONTROL_TEMPLATE, AUTHORITY_CONTROL_ID) and page.botMayEdit():
+        #if need_authority_control_template(page, AUTHORITY_CONTROL_TEMPLATE, AUTHORITY_CONTROL_ID) and page.botMayEdit():
+        if page.botMayEdit():
             success = add_authority_control_template(site, page, summary)
             if success:
                 print(title)
