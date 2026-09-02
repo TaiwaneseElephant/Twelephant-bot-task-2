@@ -71,8 +71,8 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit) -> set:
     while True:
         query = query_string % (properties, query_limit, offset)
         result = SparqlQuery.select(query)
+        print(result)
         if len(result) <　query_limit:
-            print(result)
             break
         result = [i["title"] for i in result]
         pages.update(result)
@@ -103,6 +103,7 @@ def main(limit:int = float("inf")):
         except Exception as e:
             print(f"SparqlQueryError: {e}")
     pages_need_authority_control_template = pages_need_authority_control_template - pages_have_template
+    print(pages_need_authority_control_template)
     t = 0
     for title in pages_need_authority_control_template:
         page = pwb.Page(site, title)
