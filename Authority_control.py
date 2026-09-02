@@ -97,9 +97,11 @@ def main(limit:int = float("inf")):
     pages_have_template = set([page.title() for page in pwb.Page(site, AUTHORITY_CONTROL_TEMPLATE).embeddedin(namespaces=0)])
     while True:
         try:
-            pages_need_authority_control_template = getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit) - pages_have_template
+            pages_need_authority_control_template = getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit)
+            break
         except Exception as e:
             print(f"SparqlQueryError: {e}")
+    pages_need_authority_control_template = pages_need_authority_control_template - pages_have_template
     t = 0
     for title in pages_need_authority_control_template:
         page = pwb.Page(site, title)
