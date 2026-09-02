@@ -34,7 +34,7 @@ def save(site, page, func = lambda x:x, summary:str = "", max_retry_times:int = 
         except pwb.exceptions.TitleblacklistError as e:
             print(f"Warning! The edit attempt on page '{page.title()}' was disallowed because the title is blacklisted!")
             break
-    print(f"The attempt to edit the page '{page.title()}' was stopped because of the error below:\n{e}\nThe edit is '{text[:100]}', and the summary is '{summary}'.")
+    print(f"The attempt to edit the page '{page.title()}' was stopped because of the error below:\n{e}.")
     return False
 
 def check_switch(site) -> bool:
