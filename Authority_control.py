@@ -72,7 +72,7 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit) -> set:
         query = query_string % (properties, query_limit, offset)
         result = SparqlQuery.select(query)
         print(result)
-        if len(result) <　query_limit:
+        if len(result) < query_limit:
             break
         result = [i["title"] for i in result]
         pages.update(result)
