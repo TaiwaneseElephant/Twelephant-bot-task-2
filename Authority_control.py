@@ -74,7 +74,7 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit) -> set:
         if not result:
             break
         result = [i["title"] for i in result]
-        pages = pages or set(result)
+        pages.update(result)
         offset += query_limit
         time.sleep(6)
     return pages
