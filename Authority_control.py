@@ -104,7 +104,7 @@ def main(limit:int = float("inf")):
     except:
         print("Failed to load config.")
         return
-    for page in pagegenerators.WikibaseItemFilterPageGenerator(pagegenerators.AllpagesPageGenerator(filterredir=False, site=site)):
+    for page in pagegenerators.AllpagesPageGenerator(filterredir=False, site=site, namespace=0):
         if  not need_authority_control_template(page, AUTHORITY_CONTROL_TEMPLATE, AUTHORITY_CONTROL_ID):
             continue
         success = add_authority_control_template(site, page, summary)
