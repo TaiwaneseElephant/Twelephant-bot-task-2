@@ -77,7 +77,7 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit) -> set:
         result = [i["title"] for i in result]
         pages.update(result)
         offset += query_limit
-        time.sleep(6)
+        time.sleep(60)
     return pages
 
 def main(limit:int = float("inf")):
