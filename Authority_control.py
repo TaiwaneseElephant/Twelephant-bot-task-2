@@ -74,7 +74,6 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str, query_limit:int)
         if len(result) < query_limit:
             break
         offset += query_limit
-        time.sleep(60)
     return pages
 
 def main(limit:int = float("inf")):
