@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import pywikibot as pwb
 from pywikibot import pagegenerators, textlib
-import json
 import re
 import time
 
@@ -46,21 +45,6 @@ def check_switch(site) -> bool:
     except:
         return False
 
-def has_authority_control(page, AUTHORITY_CONTROL_ID) -> bool:
-    try:
-        item = pwb.ItemPage.fromPage(page)
-        repo = item.repo
-        claims = item.get().get("claims", {})
-        for prop_id in claims:
-            try:
-                if  int(prop_id[1:]) in AUTHORITY_CONTROL_ID:
-                    return True
-            except:
-                pass
-    except pwb.exceptions.NoPageError:
-        pass
-    return False
-
 def add_authority_control_template(site, page, summary) -> None:
     text = page.get(force = True)
     cats = textlib.getCategoryLinks(text, site)
@@ -71,13 +55,11 @@ def add_authority_control_template(site, page, summary) -> None:
     text = textlib.replaceCategoryLinks(text, cats, site, add_only = True)
     return save(site, page, text, summary, True)
 
-def need_authority_control_template(page, AUTHORITY_CONTROL_TEMPLATE, AUTHORITY_CONTROL_ID) -> bool:
-    if page.isRedirectPage() or page.isDisambig():
-        return False
+def hasTemplate(page, AUTHORITY_CONTROL_TEMPLATE):
     for template in page.itertemplates(namespaces=10):
-      if template.title() == AUTHORITY_CONTROL_TEMPLATE:
-          return False
-    return has_authority_control(page, AUTHORITY_CONTROL_ID)
+        if template.title() == AUTHORITY_CONTROL_TEMPLATE:
+            return True
+    return False
 
 def getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit) -> set:
     properties = (" ".join(["wdt:P%d" % i for i in AUTHORITY_CONTROL_ID]))
@@ -85,37 +67,37 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit) -> set:
     offset = 0
     pages = set()
     while True:
-      result = SparqlQuery.query(query=query_string % (properties, query_limit, offset))
-      if not result:
-          break
-      pages = pages or set(result)
-      offset += query_limit
-      time.sleep(6)
+        result = SparqlQuery.query(query=query_string % (properties, query_limit, offset))
+        if not result:
+            break
+        pages = pages or set(result)
+        offset += query_limit
+        time.sleep(6)
     return pages
 
 def main(limit:int = float("inf")):
     site = pwb.Site("wikipedia:zh")
     try:
-      config = json.loads(pwb.Page(site, "User:Twelephant-bot/task/2/config.json").text)
-      AUTHORITY_CONTROL_ID = config["authority control id"]
-      AUTHORITY_CONTROL_TEMPLATE = config["template"]
-      query_string = config["query string"]
-      query_limit = config["query limit"]
-      summary = config["summary"]
-      if not config["Enable"]:
-        return
+        config = json.loads(pwb.Page(site, "User:Twelephant-bot/task/2/config.json").text)
+        AUTHORITY_CONTROL_ID = config["authority control id"]
+        AUTHORITY_CONTROL_TEMPLATE = config["template"]
+        query_string = config["query string"]
+        query_limit = config["query limit"]
+        summary = config["summary"]
+        if not config["Enable"]:
+            return
     except:
-      print("Failed to load config.")
-      return
+        print("Failed to load config.")
+        return
     pages_have_template = set([page.title() for page in pwb.Page(site, AUTHORITY_CONTROL_TEMPLATE).embeddedin(namespaces=0)])
     pages_need_authority_control_template = getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit) - pages_have_template
     for title in pages_need_authority_control_template:
         page = pwb.Page(site, title)
-        #if need_authority_control_template(page, AUTHORITY_CONTROL_TEMPLATE, AUTHORITY_CONTROL_ID) and page.botMayEdit():
-        if page.botMayEdit():
-            success = add_authority_control_template(site, page, summary)
-            if success:
-                print(title)
+        if not page.botMayEdit() or page.isRedirectPage() or page.isDisambig() or hasTemplate(page, AUTHORITY_CONTROL_TEMPLATE):
+              continue
+        success = add_authority_control_template(site, page, summary)
+        if success:
+              print(title)
                 if not check_switch(site):
                     break
 
