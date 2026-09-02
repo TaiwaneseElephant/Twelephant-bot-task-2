@@ -91,8 +91,6 @@ def main(limit:int = float("inf")):
     except:
         print("Failed to load config.")
         return
-    pages_have_template = set([page.title() for page in pwb.Page(site, AUTHORITY_CONTROL_TEMPLATE).embeddedin(namespaces=0)])
-    print(len(pages_have_template))
     while True:
         try:
             pages_need_authority_control_template = getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit)
@@ -100,7 +98,7 @@ def main(limit:int = float("inf")):
         except Exception as e:
             print(f"SparqlQueryError: {e}")
             time.sleep(60)
-    pages_need_authority_control_template = pages_need_authority_control_template - pages_have_template
+    pages_need_authority_control_template = pages_need_authority_control_template
     print(len(pages_need_authority_control_template))
     t = 0
     for title in pages_need_authority_control_template:
