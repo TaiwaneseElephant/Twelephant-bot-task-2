@@ -20,21 +20,21 @@ def save(site, page, func = lambda x:x, summary:str = "", max_retry_times:int = 
             page.save(summary, minor = True, bot=True)
             return True
         except pwb.exceptions.EditConflictError as e:
-            print(f"Warning! There is an edit conflict on page '{page.title()}'!")
+            print(f"Warning! There is an edit conflict on page '{page.title()}'!", flush=True)
             oringinal_text = page.get(force = True, get_redirect = True)
         except pwb.exceptions.LockedPageError as e:
-            print(f"Warning! The edit attempt on page '{page.title()}' was disallowed because the page is protected!")
+            print(f"Warning! The edit attempt on page '{page.title()}' was disallowed because the page is protected!", flush=True)
             break
         except pwb.exceptions.AbuseFilterDisallowedError as e:
-            print(f"Warning! The edit attempt on page '{page.title()}' was disallowed by the AbuseFilter!")
+            print(f"Warning! The edit attempt on page '{page.title()}' was disallowed by the AbuseFilter!", flush=True)
             break
         except pwb.exceptions.SpamblacklistError as e:
-            print(f"Warning! The edit attempt on page '{page.title()}' was disallowed by the SpamFilter because the edit add blacklisted URL!")
+            print(f"Warning! The edit attempt on page '{page.title()}' was disallowed by the SpamFilter because the edit add blacklisted URL!", flush=True)
             break
         except pwb.exceptions.TitleblacklistError as e:
-            print(f"Warning! The edit attempt on page '{page.title()}' was disallowed because the title is blacklisted!")
+            print(f"Warning! The edit attempt on page '{page.title()}' was disallowed because the title is blacklisted!", flush=True)
             break
-    print(f"The attempt to edit the page '{page.title()}' was stopped because of the error below:\n{e}.")
+    print(f"The attempt to edit the page '{page.title()}' was stopped because of the error below:\n{e}.", flush=True)
     return False
 
 def check_switch(site) -> bool:
@@ -70,7 +70,7 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str, query_limit:int)
         result = SparqlQuery.select(query)
         result = [i["title"] for i in result]
         pages.update(result)
-        print(f"Offset:{offset}")
+        print(len(result}, flush=True)
         if len(result) < query_limit:
             break
         offset += query_limit
@@ -87,7 +87,7 @@ def main(limit:int = float("inf")):
         query_limit = config["query limit"]
         summary = config["summary"]
         if not config["Enable"]:
-            print("Stop!")
+            print("Stop!", flush=True)
             return
     except:
         print("Failed to load config.")
@@ -97,10 +97,10 @@ def main(limit:int = float("inf")):
             pages_need_authority_control_template = getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit)
             break
         except Exception as e:
-            print(f"SparqlQueryError: {e}")
+            print(f"SparqlQueryError: {e}", flush=True)
             time.sleep(60)
     pages_need_authority_control_template = pages_need_authority_control_template
-    print(len(pages_need_authority_control_template))
+    print(len(pages_need_authority_control_template), flush=True)
     t = 0
     for title in pages_need_authority_control_template:
         page = pwb.Page(site, title)
@@ -111,10 +111,10 @@ def main(limit:int = float("inf")):
             print(title)
             t += 1
             if  t >= limit:
-                print("Finshed!")
+                print("Finshed!", flush=True)
                 break
             if t % 10 == 0 and not check_switch(site):
-                print("Stop!")
+                print("Stop!", flush=True)
                 break
 
 if __name__ == "__main__":
