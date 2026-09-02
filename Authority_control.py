@@ -63,7 +63,7 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str) -> set:
     SparqlQuery = sparql.SparqlQuery()
     pages = set()
     for id in AUTHORITY_CONTROL_ID:
-        query = query_string % (id, query_limit)
+        query = query_string % id
         print(query)
         while True:
             try:
