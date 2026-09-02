@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import pywikibot as pwb
 from pywikibot import pagegenerators, textlib
+from pywikibot.data import sparql
 import re
 import time
 
