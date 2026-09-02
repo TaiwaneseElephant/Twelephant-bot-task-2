@@ -118,9 +118,9 @@ def main(limit:int = float("inf")):
             if  t >= limit:
                 print("Stop!")
                 break
-        if t % 10 == 0 and not check_switch(site):
-            print("Stop!")
-            break
+            if t % 10 == 0 and not check_switch(site):
+                print("Stop!")
+                break
 
 if __name__ == "__main__":
     main(50)
