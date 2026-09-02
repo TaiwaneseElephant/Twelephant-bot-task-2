@@ -79,22 +79,36 @@ def need_authority_control_template(page, AUTHORITY_CONTROL_TEMPLATE, AUTHORITY_
           return False
     return has_authority_control(page, AUTHORITY_CONTROL_ID)
 
+def getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit) -> set:
+    properties = (" ".join(["wdt:P%d" % i for i in AUTHORITY_CONTROL_ID]))
+    SparqlQuery = sparql.SparqlQuery()
+    offset = 0
+    pages = set()
+    while True:
+      result = SparqlQuery.query(query=query_string % (properties, query_limit, offset))
+      if not result:
+          break
+      pages = pages or set(result)
+      offset += query_limit
+      time.sleep(6)
+    return pages
+
 def main(limit:int = float("inf")):
     site = pwb.Site("wikipedia:zh")
     try:
       config = json.loads(pwb.Page(site, "User:Twelephant-bot/task/2/config.json").text)
-      #AUTHORITY_CONTROL_ID = config["authority control id"]
-      #AUTHORITY_CONTROL_TEMPLATE = config["template"]
-      updatepage = config["updatepage"]
+      AUTHORITY_CONTROL_ID = config["authority control id"]
+      AUTHORITY_CONTROL_TEMPLATE = config["template"]
+      query_string = config["query string"]
+      query_limit = config["query limit"]
       summary = config["summary"]
       if not config["Enable"]:
         return
     except:
-      print("Failed to load config")
+      print("Failed to load config.")
       return
-    pages_have_template = set([page.title() for page in pwb.Page(site, "Template:Authority control").embeddedin(namespaces =0)])
-    with open("pages_need_authority_control_template.json", encoding="utf-8") as f:
-        pages_need_authority_control_template = set(json.load(f) - pages_have_template
+    pages_have_template = set([page.title() for page in pwb.Page(site, AUTHORITY_CONTROL_TEMPLATE).embeddedin(namespaces=0)])
+    pages_need_authority_control_template = getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit) - pages_have_template
     for title in pages_need_authority_control_template:
         page = pwb.Page(site, title)
         #if need_authority_control_template(page, AUTHORITY_CONTROL_TEMPLATE, AUTHORITY_CONTROL_ID) and page.botMayEdit():
