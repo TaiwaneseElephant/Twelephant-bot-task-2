@@ -48,7 +48,7 @@ def check_switch(site) -> bool:
         return False
 def has_authority_control(page, AUTHORITY_CONTROL_ID) -> bool:
     try:
-        item = pywikibot.ItemPage.fromPage(page)
+        item = pwb.ItemPage.fromPage(page)
         repo = item.repo
         claims = item.get().get("claims", {})
         for prop_id in claims:
@@ -57,7 +57,7 @@ def has_authority_control(page, AUTHORITY_CONTROL_ID) -> bool:
                     return True
             except:
                 pass
-    except pywikibot.exceptions.NoPageError:
+    except pwb.exceptions.NoPageError:
         pass
     return False
 
