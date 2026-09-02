@@ -67,7 +67,12 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str, query_limit:int)
     while True:
         query = query_string % (properties, query_limit, offset)
         print(query)
-        result = SparqlQuery.select(query)
+        try:
+            result = SparqlQuery.select(query)
+        except Exception as e:
+            print(f"SparqlQueryError: {e}", flush=True)
+            time.sleep(60)
+            continue
         result = [i["title"] for i in result]
         pages.update(result)
         print(len(result), flush=True)
