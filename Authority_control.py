@@ -59,26 +59,22 @@ def hasTemplate(page, AUTHORITY_CONTROL_TEMPLATE) -> bool:
             return True
     return False
 
-def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str, query_limit:int) -> set:
-    properties = (" ".join(["wdt:P%d" % i for i in AUTHORITY_CONTROL_ID]))
+def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str) -> set:
     SparqlQuery = sparql.SparqlQuery()
-    offset = 0
     pages = set()
-    while True:
-        query = query_string % (properties, query_limit, offset)
+    for id in AUTHORITY_CONTROL_ID:
+        query = query_string % (id, query_limit)
         print(query)
-        try:
-            result = SparqlQuery.select(query)
-        except Exception as e:
-            print(f"SparqlQueryError: {e}", flush=True)
-            time.sleep(60)
-            continue
+        while True:
+            try:
+                result = SparqlQuery.select(query)
+                break
+            except Exception as e:
+                print(f"SparqlQueryError: {e}", flush=True)
+                time.sleep(60)
         result = [i["title"] for i in result]
         pages.update(result)
         print(len(result), flush=True)
-        if len(result) < query_limit:
-            break
-        offset += query_limit
     return pages
 
 def main(limit:int = float("inf")):
@@ -88,7 +84,6 @@ def main(limit:int = float("inf")):
         AUTHORITY_CONTROL_ID = config["authority control id"]
         AUTHORITY_CONTROL_TEMPLATE = config["template"]
         query_string = config["query string"]
-        query_limit = config["query limit"]
         summary = config["summary"]
         if not config["Enable"]:
             print("Stop!", flush=True)
@@ -98,7 +93,7 @@ def main(limit:int = float("inf")):
         return
     while True:
         try:
-            pages_need_authority_control_template = getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit)
+            pages_need_authority_control_template = getSparqlQuery(AUTHORITY_CONTROL_ID, query_string)
             break
         except Exception as e:
             print(f"SparqlQueryError: {e}", flush=True)
