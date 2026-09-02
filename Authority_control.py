@@ -94,6 +94,7 @@ def main(limit:int = float("inf")):
         return
     pages_have_template = set([page.title() for page in pwb.Page(site, AUTHORITY_CONTROL_TEMPLATE).embeddedin(namespaces=0)])
     pages_need_authority_control_template = getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit) - pages_have_template
+    t = 0
     for title in pages_need_authority_control_template:
         page = pwb.Page(site, title)
         if not page.botMayEdit() or page.isRedirectPage() or page.isDisambig() or hasTemplate(page, AUTHORITY_CONTROL_TEMPLATE):
@@ -101,8 +102,9 @@ def main(limit:int = float("inf")):
         success = add_authority_control_template(site, page, summary)
         if success:
             print(title)
-                if not check_switch(site):
-                    break
+            t += 1
+            if not check_switch(site) or t >= limit:
+                break
 
 if __name__ == "__main__":
-    main()
+    main(50)
