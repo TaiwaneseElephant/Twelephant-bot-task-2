@@ -111,9 +111,12 @@ def main(limit:int = float("inf")):
         if success:
             print(title)
             t += 1
-            if not check_switch(site) or t >= limit:
+            if  t >= limit:
                 print("Stop!")
                 break
+        if t % 10 == 0 and not check_switch(site):
+            print("Stop!")
+            break
 
 if __name__ == "__main__":
     main(50)
