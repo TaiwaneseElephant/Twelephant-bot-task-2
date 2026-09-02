@@ -68,7 +68,8 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit) -> set:
     offset = 0
     pages = set()
     while True:
-        result = SparqlQuery.query(query=query_string % (properties, query_limit, offset))
+        query = query_string % (properties, query_limit, offset)
+        result = SparqlQuery.query(query))
         if not result:
             break
         pages = pages or set(result)
