@@ -97,10 +97,10 @@ def main(limit:int = float("inf")):
     for title in pages_need_authority_control_template:
         page = pwb.Page(site, title)
         if not page.botMayEdit() or page.isRedirectPage() or page.isDisambig() or hasTemplate(page, AUTHORITY_CONTROL_TEMPLATE):
-              continue
+            continue
         success = add_authority_control_template(site, page, summary)
         if success:
-              print(title)
+            print(title)
                 if not check_switch(site):
                     break
 
