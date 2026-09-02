@@ -105,13 +105,13 @@ def main(limit:int = float("inf")):
         print("Failed to load config.")
         return
     for page in pagegenerators.AllpagesPageGenerator(filterredir=False, site=site, namespace=0):
-        if  not need_authority_control_template(page, AUTHORITY_CONTROL_TEMPLATE, AUTHORITY_CONTROL_ID):
+        if not need_authority_control_template(page, AUTHORITY_CONTROL_TEMPLATE, AUTHORITY_CONTROL_ID):
             continue
         success = add_authority_control_template(site, page, summary)
         if success:
             t += 1
             if  t >= limit:
-                print("Stop!")
+                print("Finish!")
                 break
             if t % 10 == 0 and not check_switch(site):
                 print("Stop!")
