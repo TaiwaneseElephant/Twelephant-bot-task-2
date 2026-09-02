@@ -8,19 +8,16 @@ import json
 
 BOTTOM_PATTERN = re.compile(r"\{\{\s*(?:(?:[Tt](?:emplate)?|模板)\s*:)?\s*(?:DEFAULTSORT:.*?|[Ss]tub(?:\|.*?)?|.*?-stub(?:\|.*?)?|.*?小作品(?:\|.*?)?|小條目(?:\|.*?)?)\s*\}\}", flags = re.DOTALL)
 
-def save(site, page, text:str, summary:str = "", minor:bool = True, max_retry_times:int = 3):
+def save(site, page, func = lambda x:x, summary:str = "", max_retry_times:int = 3):
     e = None
-    oringinal_text = ""
     if page.exists():
         oringinal_text = page.get(force = True, get_redirect = False)
     else:
       return False
     for _ in range(max_retry_times):
         try:
-            if text == oringinal_text:
-              return False
-            page.text = text
-            page.save(summary, minor = minor, bot=True)
+            page.text = func(oringinal_text, site)
+            page.save(summary, minor = True, bot=True)
             return True
         except pwb.exceptions.EditConflictError as e:
             print(f"Warning! There is an edit conflict on page '{page.title()}'!")
@@ -47,23 +44,22 @@ def check_switch(site) -> bool:
     except:
         return False
 
-def add_authority_control_template(site, page, summary) -> None:
-    text = page.get(force = True)
+def add_authority_control_template(text, site) -> None:
     cats = textlib.getCategoryLinks(text, site)
     text = textlib.removeCategoryLinks(text, site)
     match = BOTTOM_PATTERN.findall(text)
     text = BOTTOM_PATTERN.sub("", text)
     text = f"{text.rstrip()}\n{{{{Authority control}}}}\n{'\n'.join(match)}"
     text = textlib.replaceCategoryLinks(text, cats, site, add_only = True)
-    return save(site, page, text, summary, True)
+    return text
 
-def hasTemplate(page, AUTHORITY_CONTROL_TEMPLATE):
+def hasTemplate(page, AUTHORITY_CONTROL_TEMPLATE) -> bool:
     for template in page.itertemplates(namespaces=10):
         if template.title() == AUTHORITY_CONTROL_TEMPLATE:
             return True
     return False
 
-def getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit) -> set:
+def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str, query_limit:int) -> set:
     properties = (" ".join(["wdt:P%d" % i for i in AUTHORITY_CONTROL_ID]))
     SparqlQuery = sparql.SparqlQuery()
     offset = 0
@@ -73,6 +69,7 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit) -> set:
         result = SparqlQuery.select(query)
         result = [i["title"] for i in result]
         pages.update(result)
+        print(f"Offset:{offset}")
         if len(result) < query_limit:
             break
         offset += query_limit
@@ -101,6 +98,7 @@ def main(limit:int = float("inf")):
             break
         except Exception as e:
             print(f"SparqlQueryError: {e}")
+            time.sleep(60)
     pages_need_authority_control_template = pages_need_authority_control_template - pages_have_template
     print(len(pages_need_authority_control_template))
     t = 0
@@ -108,16 +106,16 @@ def main(limit:int = float("inf")):
         page = pwb.Page(site, title)
         if not page.botMayEdit() or page.isRedirectPage() or page.isDisambig() or hasTemplate(page, AUTHORITY_CONTROL_TEMPLATE):
             continue
-        success = add_authority_control_template(site, page, summary)
+        success = save(site, page, add_authority_control_template, summary)
         if success:
             print(title)
             t += 1
             if  t >= limit:
+                print("Finshed!")
+                break
+            if t % 10 == 0 and not check_switch(site):
                 print("Stop!")
                 break
-        if t % 10 == 0 and not check_switch(site):
-            print("Stop!")
-            break
 
 if __name__ == "__main__":
     main(50)
