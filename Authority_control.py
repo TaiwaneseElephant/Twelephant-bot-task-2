@@ -104,16 +104,11 @@ def main(limit:int = float("inf")):
     except:
         print("Failed to load config.")
         return
-    pages_have_template = set([page.title() for page in pwb.Page(site, AUTHORITY_CONTROL_TEMPLATE).embeddedin(namespaces=0)])
     for oage in pagegenerators.WikibaseItemFilterPageGenerator(pagegenerators.AllpagesPageGenerator(includeredirects=False, site=site)):
-        title = page.title()
-        if title in pages_have_template:
-            continue
         if  not need_authority_control_template(page, AUTHORITY_CONTROL_TEMPLATE, AUTHORITY_CONTROL_ID):
             continue
         success = add_authority_control_template(site, page, summary)
         if success:
-            print(title)
             t += 1
             if  t >= limit:
                 print("Stop!")
