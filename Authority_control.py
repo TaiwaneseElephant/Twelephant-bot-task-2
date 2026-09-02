@@ -89,6 +89,7 @@ def main(limit:int = float("inf")):
         query_limit = config["query limit"]
         summary = config["summary"]
         if not config["Enable"]:
+            print("Stop!")
             return
     except:
         print("Failed to load config.")
@@ -105,6 +106,7 @@ def main(limit:int = float("inf")):
             print(title)
             t += 1
             if not check_switch(site) or t >= limit:
+                print("Stop!")
                 break
 
 if __name__ == "__main__":
