@@ -46,6 +46,20 @@ def check_switch(site) -> bool:
         return json.loads(switch_page.text)["Enable"]
     except:
         return False
+def has_authority_control(page, AUTHORITY_CONTROL_ID) -> bool:
+    try:
+        item = pywikibot.ItemPage.fromPage(page)
+        repo = item.repo
+        claims = item.get().get("claims", {})
+        for prop_id in claims:
+            try:
+                if  int(prop_id[1:]) in AUTHORITY_CONTROL_ID:
+                    return True
+            except:
+                pass
+    except pywikibot.exceptions.NoPageError:
+        pass
+    return False
 
 def add_authority_control_template(site, page, summary) -> None:
     text = page.get(force = True)
@@ -57,27 +71,23 @@ def add_authority_control_template(site, page, summary) -> None:
     text = textlib.replaceCategoryLinks(text, cats, site, add_only = True)
     return save(site, page, text, summary, True)
 
-def hasTemplate(page, AUTHORITY_CONTROL_TEMPLATE):
+def need_authority_control_template(page, AUTHORITY_CONTROL_TEMPLATE, AUTHORITY_CONTROL_ID) -> bool:
+    if not page.botMayEdit() or page.isRedirectPage() or page.isDisambig():
+        return False
     for template in page.itertemplates(namespaces=10):
-        if template.title() == AUTHORITY_CONTROL_TEMPLATE:
-            return True
-    return False
+      if template.title() == AUTHORITY_CONTROL_TEMPLATE:
+          return False
+    return has_authority_control(page, AUTHORITY_CONTROL_ID)
 
-def getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit) -> set:
-    properties = (" ".join(["wdt:P%d" % i for i in AUTHORITY_CONTROL_ID]))
-    SparqlQuery = sparql.SparqlQuery()
-    offset = 0
-    pages = set()
-    while True:
-        query = query_string % (properties, query_limit, offset)
-        result = SparqlQuery.select(query)
-        result = [i["title"] for i in result]
-        pages.update(result)
-        if len(result) < query_limit:
-            break
-        offset += query_limit
-        time.sleep(60)
-    return pages
+def add_authority_control_template(site, page, summary) -> None:
+    text = page.get(force = True)
+    cats = textlib.getCategoryLinks(text, site)
+    text = textlib.removeCategoryLinks(text, site)
+    match = BOTTOM_PATTERN.findall(text)
+    text = BOTTOM_PATTERN.sub("", text)
+    text = f"{text.rstrip()}\n{{{{Authority control}}}}\n{'\n'.join(match)}"
+    text = textlib.replaceCategoryLinks(text, cats, site, add_only = True)
+    return save(site, page, text, summary, True)
 
 def main(limit:int = float("inf")):
     site = pwb.Site("wikipedia:zh")
@@ -95,18 +105,11 @@ def main(limit:int = float("inf")):
         print("Failed to load config.")
         return
     pages_have_template = set([page.title() for page in pwb.Page(site, AUTHORITY_CONTROL_TEMPLATE).embeddedin(namespaces=0)])
-    while True:
-        try:
-            pages_need_authority_control_template = getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit)
-            break
-        except Exception as e:
-            print(f"SparqlQueryError: {e}")
-    pages_need_authority_control_template = pages_need_authority_control_template - pages_have_template
-    print(len(pages_need_authority_control_template))
-    t = 0
-    for title in pages_need_authority_control_template:
-        page = pwb.Page(site, title)
-        if not page.botMayEdit() or page.isRedirectPage() or page.isDisambig() or hasTemplate(page, AUTHORITY_CONTROL_TEMPLATE):
+    for oage in pagegenerators.WikibaseItemFilterPageGenerator(pagegenerators.AllpagesPageGenerator(includeredirects=False, site=site))):
+        title = page.title()
+        if title in pages_have_template:
+            continue
+        if  not need_authority_control_template(page, AUTHORITY_CONTROL_TEMPLATE, AUTHORITY_CONTROL_ID):
             continue
         success = add_authority_control_template(site, page, summary)
         if success:
