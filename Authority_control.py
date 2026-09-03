@@ -85,8 +85,7 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str, query_limit:int)
 def main(limit:int = float("inf")) -> None:
     site = pwb.Site("wikipedia:zh")
     try:
-        config = json.loads(requests.get("https://zh.wikipedia.org/w/index.php?title=User:Twelephant-bot/task/2/config.json&action=raw&ctype=application/json", \
-                                        headers={"user-agent": "Twelephant-bot"}).json())
+        config = json.loads(pwb.Page(site, "User:Twelephant-bot/task/2/config.json").text)
         AUTHORITY_CONTROL_ID = config["authority control id"]
         template = config["template"]
         module = config["module"]
