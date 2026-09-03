@@ -2,7 +2,7 @@
 import pywikibot as pwb
 from pywikibot import pagegenerators, textlib
 from pywikibot.data import sparql
-import re, time, json requests
+import re, time, json, requests
 
 BOTTOM_PATTERN = re.compile(r"\{\{\s*(?:(?:[Tt](?:emplate)?|模板)\s*:)?\s*(?:DEFAULTSORT:.*?|[Ss]tub(?:\|.*?)?|.*?-stub(?:\|.*?)?|.*?小作品(?:\|.*?)?|小條目(?:\|.*?)?)\s*\}\}", flags = re.DOTALL)
 
