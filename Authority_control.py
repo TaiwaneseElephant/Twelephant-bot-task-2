@@ -86,13 +86,7 @@ def main(limit:int = float("inf")) -> None:
     except:
         print("Failed to load config.")
         return
-    while True:
-        try:
-            pages_need_authority_control_template = getSparqlQuery(AUTHORITY_CONTROL_ID, query_string)
-            break
-        except Exception as e:
-            print(f"SparqlQueryError: {e}", flush=True)
-            time.sleep(10)
+    pages_need_authority_control_template = getSparqlQuery(AUTHORITY_CONTROL_ID, query_string)
     print(len(pages_need_authority_control_template), flush=True)
     templatepage = pwb.Page(site, template, ns=10)
     templatepagealt = pwb.Page(site, template_alt)
