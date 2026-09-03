@@ -89,7 +89,7 @@ def main(limit:int = float("inf")) -> None:
     pages_need_authority_control_template = getSparqlQuery(AUTHORITY_CONTROL_ID, query_string)
     print(len(pages_need_authority_control_template), flush=True)
     templatepage = pwb.Page(site, template, ns=10)
-    modulepage = pwb.Page(site, module)
+    modulepage = pwb.Page(site, module, ns=828)
     t = 0
     for title in pages_need_authority_control_template:
         page = pwb.Page(site, title)
