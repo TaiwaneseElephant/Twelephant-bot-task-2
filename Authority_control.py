@@ -54,7 +54,12 @@ def add_authority_control_template(text, site, template) -> str:
     return text
 
 def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str) -> set:
-    SparqlQuery = sparql.SparqlQuery()
+    while True:
+        try:
+            SparqlQuery = sparql.SparqlQuery()
+            break
+        except Exception as e:
+            print(f"SparqlQueryError: {e}", flush=True)
     pages = set()
     for id in AUTHORITY_CONTROL_ID:
         query = query_string % id
