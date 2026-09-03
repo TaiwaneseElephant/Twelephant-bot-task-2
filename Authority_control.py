@@ -93,7 +93,7 @@ def main(limit:int = float("inf")) -> None:
     t = 0
     for title in pages_need_authority_control_template:
         page = pwb.Page(site, title)
-        if not page.botMayEdit() or page.isRedirectPage() or page.isDisambig() or any(tp in (templatepage , templatepagealt) for tp in page.itertemplates(namespaces=(10, 282))):
+        if not page.botMayEdit() or page.isRedirectPage() or page.isDisambig() or any(tp in (templatepage , templatepagealt) for tp in page.itertemplates(namespaces=(10, 828))):
             continue
         success = save(site, page, add_authority_control_template, summary, template = template)
         if success:
