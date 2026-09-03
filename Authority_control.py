@@ -65,6 +65,7 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str) -> set:
                 break
             except Exception as e:
                 print(f"SparqlQueryError: {e}", flush=True)
+                time.sleep(10)
         result = [i["title"] for i in result]
         pages.update(result)
         print(len(result), flush=True)
@@ -91,6 +92,7 @@ def main(limit:int = float("inf")) -> None:
             break
         except Exception as e:
             print(f"SparqlQueryError: {e}", flush=True)
+            time.sleep(10)
     print(len(pages_need_authority_control_template), flush=True)
     templatepage = pwb.Page(site, template, ns=10)
     templatepagealt = pwb.Page(site, template_alt)
