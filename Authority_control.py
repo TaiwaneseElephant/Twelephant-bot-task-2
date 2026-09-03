@@ -77,7 +77,7 @@ def main(limit:int = float("inf")) -> None:
         config = json.loads(pwb.Page(site, "User:Twelephant-bot/task/2/config.json").text)
         AUTHORITY_CONTROL_ID = config["authority control id"]
         template = config["template"]
-        template_alt = config["alt template"]
+        module = config["module"]
         query_string = config["query string"]
         summary = config["summary"]
         if not config["Enable"]:
@@ -89,11 +89,11 @@ def main(limit:int = float("inf")) -> None:
     pages_need_authority_control_template = getSparqlQuery(AUTHORITY_CONTROL_ID, query_string)
     print(len(pages_need_authority_control_template), flush=True)
     templatepage = pwb.Page(site, template, ns=10)
-    templatepagealt = pwb.Page(site, template_alt)
+    modulepage = pwb.Page(site, module)
     t = 0
     for title in pages_need_authority_control_template:
         page = pwb.Page(site, title)
-        if not page.botMayEdit() or page.isRedirectPage() or page.isDisambig() or any(tp in (templatepage , templatepagealt) for tp in page.itertemplates(namespaces=(10, 828))):
+        if not page.botMayEdit() or page.isRedirectPage() or page.isDisambig() or any(tp in (templatepage, modulepage) for tp in page.itertemplates(namespaces=(10, 828))):
             continue
         success = save(site, page, add_authority_control_template, summary, template = template)
         if success:
