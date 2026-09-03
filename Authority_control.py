@@ -67,6 +67,8 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str) -> set:
         while True:
             try:
                 result = SparqlQuery.select(query)
+                if result is None:
+                    raise Exception("result is 'None'")
                 break
             except Exception as e:
                 print(f"SparqlQueryError: {e}", flush=True)
