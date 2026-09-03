@@ -2,9 +2,7 @@
 import pywikibot as pwb
 from pywikibot import pagegenerators, textlib
 from pywikibot.data import sparql
-import re
-import time
-import json
+import re, time, json requests
 
 BOTTOM_PATTERN = re.compile(r"\{\{\s*(?:(?:[Tt](?:emplate)?|模板)\s*:)?\s*(?:DEFAULTSORT:.*?|[Ss]tub(?:\|.*?)?|.*?-stub(?:\|.*?)?|.*?小作品(?:\|.*?)?|小條目(?:\|.*?)?)\s*\}\}", flags = re.DOTALL)
 
@@ -53,7 +51,7 @@ def add_authority_control_template(text, site, template) -> str:
     text = textlib.replaceCategoryLinks(text, cats, site, add_only = True)
     return text
 
-def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str) -> set:
+def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str, query_limit:int) -> set:
     while True:
         try:
             SparqlQuery = sparql.SparqlQuery()
@@ -64,28 +62,36 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str) -> set:
     for id in AUTHORITY_CONTROL_ID:
         query = query_string % id
         print(query)
+        offset = 0
         while True:
-            try:
-                result = SparqlQuery.select(query)
-                if result is None:
-                    raise Exception("result is 'None'")
+            query = query_string % (id, query_limit, offset)
+            while True:
+                try:
+                    result = SparqlQuery.select(query)
+                    if result is None:
+                        raise Exception("result is 'None'")
+                    break
+                except Exception as e:
+                    print(f"SparqlQueryError: {e}", flush=True)
+                    time.sleep(10)
+            result = [i["title"] for i in result]
+            pages.update(result)
+            print(len(result), flush=True)
+            if len(result) < query_limit:
                 break
-            except Exception as e:
-                print(f"SparqlQueryError: {e}", flush=True)
-                time.sleep(10)
-        result = [i["title"] for i in result]
-        pages.update(result)
-        print(len(result), flush=True)
+            offset += query_limit
     return pages
 
 def main(limit:int = float("inf")) -> None:
     site = pwb.Site("wikipedia:zh")
     try:
-        config = json.loads(pwb.Page(site, "User:Twelephant-bot/task/2/config.json").text)
+        config = json.loads(request.get("https://zh.wikipedia.org/w/index.php?title=User:Twelephant-bot/task/2/config.json&action=raw&ctype=application/json", \
+                                        headers={"user-agent": "Twelephant-bot"}).json())
         AUTHORITY_CONTROL_ID = config["authority control id"]
         template = config["template"]
         module = config["module"]
         query_string = config["query string"]
+        query_limit = config["query limit"]
         summary = config["summary"]
         if not config["Enable"]:
             print("Stop!", flush=True)
@@ -93,7 +99,7 @@ def main(limit:int = float("inf")) -> None:
     except:
         print("Failed to load config.")
         return
-    pages_need_authority_control_template = getSparqlQuery(AUTHORITY_CONTROL_ID, query_string)
+    pages_need_authority_control_template = getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit)
     print(len(pages_need_authority_control_template), flush=True)
     templatepage = pwb.Page(site, template, ns=10)
     modulepage = pwb.Page(site, module, ns=828)
