@@ -65,7 +65,6 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str) -> set:
                 break
             except Exception as e:
                 print(f"SparqlQueryError: {e}", flush=True)
-                time.sleep(60)
         result = [i["title"] for i in result]
         pages.update(result)
         print(len(result), flush=True)
@@ -92,14 +91,13 @@ def main(limit:int = float("inf")) -> None:
             break
         except Exception as e:
             print(f"SparqlQueryError: {e}", flush=True)
-            time.sleep(60)
     print(len(pages_need_authority_control_template), flush=True)
     templatepage = pwb.Page(site, template, ns=10)
     templatepagealt = pwb.Page(site, template_alt)
     t = 0
     for title in pages_need_authority_control_template:
         page = pwb.Page(site, title)
-        if not page.botMayEdit() or page.isRedirectPage() or page.isDisambig() or any(templatepage == tp or templatepagealt == tp for tp in page.itertemplates(namespaces=10)):
+        if not page.botMayEdit() or page.isRedirectPage() or page.isDisambig() or any(tp in (templatepage , templatepagealt) for tp in page.itertemplates(namespaces=10)):
             continue
         success = save(site, page, add_authority_control_template, summary, template = template)
         if success:
