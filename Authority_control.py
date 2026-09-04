@@ -59,26 +59,31 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str, query_limit:int)
         except Exception as e:
             print(f"SparqlQueryError: {e}", flush=True)
     pages = set()
-    offset = 0
-    properties = " ".join([f"wdt:P{i}" for i in AUTHORITY_CONTROL_ID])
-    while True:
-        query = query_string % (properties, query_limit, offset)
-        print(query)
+    for id in AUTHORITY_CONTROL_ID:
+        offset = 0
         while True:
-            try:
-                result = SparqlQuery.select(query)
-                if result is None:
-                    raise Exception("result is 'None'")
+            query = query_string % (id, query_limit, offset)
+            print(query)
+            tries = 0
+            while tries < 30:
+                try:
+                    result = SparqlQuery.select(query)
+                    if result is None:
+                        raise Exception("result is 'None'")
+                    break
+                except Exception as e:
+                    print(f"SparqlQueryError: {e}", flush=True)
+                    time.sleep(10)
+                    tries += 1
+            if tries == 30:
+                print("Skip due to exceeding max tries.")
                 break
-            except Exception as e:
-                print(f"SparqlQueryError: {e}", flush=True)
-                time.sleep(10)
-        result = [i["title"] for i in result]
-        pages.update(result)
-        print(len(result), flush=True)
-        if len(result) < query_limit:
-            break
-        offset += query_limit
+            result = [i["title"] for i in result]
+            pages.update(result)
+            print(len(result), flush=True)
+            if len(result) < query_limit:
+                break
+            offset += query_limit
     return pages
 
 def main(limit:int = float("inf")) -> None:
