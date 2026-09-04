@@ -60,7 +60,7 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str, query_limit:int)
             print(f"SparqlQueryError: {e}", flush=True)
     pages = set()
     offset = 0
-    properties = ", ".join([f"wdt:P{i}" for i in AUTHORITY_CONTROL_ID])
+    properties = " ".join([f"wdt:P{i}" for i in AUTHORITY_CONTROL_ID])
     while True:
         query = query_string % (properties, query_limit, offset)
         print(query)
