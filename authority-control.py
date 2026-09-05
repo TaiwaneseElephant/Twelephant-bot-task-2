@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import pywikibot as pwb
-from pywikibot import pagegenerators, textlib
+from pywikibot import textlib
 from pywikibot.data import sparql
 import re, time, json, requests
 
-BOTTOM_PATTERN = re.compile(r"\{\{\s*(?:(?:[Tt](?:emplate)?|模板)\s*:)?\s*(?:DEFAULTSORT:.*?|[Ss]tub(?:\|.*?)?|.*?-stub(?:\|.*?)?|.*?小作品(?:\|.*?)?|小條目(?:\|.*?)?)\s*\}\}", flags = re.DOTALL)
+DEFAULTSORT_PATTERN = re.compile(r"\{\{\s*DEFAULTSORT:.*\s*\}\}", flags = re.DOTALL)
+STUB_PATTERN = re.compile(r"\{\{\s*(?:(?:.*?-)?[Ss]tub(?:\s*\|.*?)?|.*?小作品(?:\s*\|.*?)?|小條目(?:\s*\|.*?)?)\s*\}\}", flags = re.DOTALL)
 
 def save(site, page, func = lambda x:x, summary:str = "", max_retry_times:int = 3, **kargs) -> bool:
     e = None
@@ -45,10 +46,17 @@ def check_switch(site) -> bool:
 def add_authority_control_template(text, site, template) -> str:
     cats = textlib.getCategoryLinks(text, site)
     text = textlib.removeCategoryLinks(text, site)
-    match = BOTTOM_PATTERN.findall(text)
-    text = BOTTOM_PATTERN.sub("", text)
-    text = f"{text.strip()}\n{{{{{template}}}}}\n{'\n'.join(match)}"
+    DEFAULTSORT = DEFAULTSORT_PATTERN.findall(text)
+    if DEFAULTSORT:
+        DEFAULTSORT = f"\n{DEFAULTSORT[0]}
+    else:
+        DEFAULTSORT = ""
+    text = DEFAULTSORT_PATTERN.sub("", text)
+    STUB = STUB_PATTERN.findall(text)
+    text = STUB_PATTERN.sub("", text)
+    text = f"{text.strip()}\n{{{{{template}}}}}{DEFAULTSORT}"
     text = textlib.replaceCategoryLinks(text, cats, site, add_only = True)
+    text = f"{text}\n{{'\n'.join(STUB)}"
     return text
 
 def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str, query_limit:int) -> set:
