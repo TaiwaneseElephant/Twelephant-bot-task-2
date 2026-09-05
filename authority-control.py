@@ -56,7 +56,7 @@ def add_authority_control_template(text, site, template) -> str:
     text = STUB_PATTERN.sub("", text)
     text = f"{text.strip()}\n{{{{{template}}}}}{DEFAULTSORT}"
     text = textlib.replaceCategoryLinks(text, cats, site, add_only = True)
-    text = f"{text}\n{{'\n'.join(STUB)}"
+    text = f"{text.strip()}\n{{'\n'.join(STUB)}"
     return text
 
 def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str, query_limit:int) -> set:
