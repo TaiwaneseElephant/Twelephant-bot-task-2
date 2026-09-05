@@ -5,7 +5,7 @@ from pywikibot.data import sparql
 import re, time, json, requests
 
 DEFAULTSORT_PATTERN = re.compile(r"\{\{\s*DEFAULTSORT:[^}]+\s*\}\}")
-STUB_PATTERN = re.compile(r"\{\{\s*(?:(?:[^|}]*?-)?[Ss]tub(?:\s*\|[^}]*?)?|.*?小作品(?:\s*\|[^}]*?)?|小條目(?:\s*\|[^}]*?)?)\s*\}\}")
+STUB_PATTERN = re.compile(r"\{\{\s*(?:(?:[^|}]*?-)?[Ss]tub(?:\s*\|[^}]*?)?|[^|}]*?小作品(?:\s*\|[^}]*?)?|小條目(?:\s*\|[^}]*?)?)\s*\}\}")
 
 def save(site, page, func = lambda x:x, summary:str = "", max_retry_times:int = 3, **kargs) -> bool:
     e = None
