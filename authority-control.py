@@ -54,7 +54,7 @@ def add_authority_control_template(text, site, template) -> str:
     text = DEFAULTSORT_PATTERN.sub("", text)
     STUB = STUB_PATTERN.findall(text)
     text = STUB_PATTERN.sub("", text)
-    text = f"{text.strip()}\n{{{{{template}}}}}{DEFAULTSORT}"
+    text = f"{text.strip()}\n{{{{{template}}}}}{DEFAULTSORT}\n"
     text = textlib.replaceCategoryLinks(text, cats, site, add_only = True)
     text = f"{text.strip()}\n{{'\n'.join(STUB)}"
     return text
