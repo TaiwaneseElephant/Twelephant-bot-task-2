@@ -114,6 +114,7 @@ def main() -> None:
     print(len(pages_need_authority_control_template), flush=True)
     templatepage = pwb.Page(site, template, ns=10)
     modulepage = pwb.Page(site, module, ns=828)
+    t = 0
     for title in pages_need_authority_control_template:
         page = pwb.Page(site, title)
         if not page.botMayEdit() or page.isRedirectPage() or page.isDisambig() or any(tp in (templatepage, modulepage) for tp in page.itertemplates(namespaces=(10, 828))):
@@ -121,7 +122,8 @@ def main() -> None:
         success = save(site, page, add_authority_control_template, summary, template = template)
         if success:
             print(title)
-            if not check_switch(site):
+            t += 1
+            if t % 10 == 0 and not check_switch(site):
                 print("Stop!", flush=True)
                 break
 
