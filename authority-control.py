@@ -94,7 +94,7 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str, query_limit:int)
             offset += query_limit
     return pages
 
-def main(limit:int = float("inf")) -> None:
+def main() -> None:
     site = pwb.Site("wikipedia:zh")
     try:
         config = json.loads(pwb.Page(site, "User:Twelephant-bot/task/2/config.json").text)
@@ -114,7 +114,6 @@ def main(limit:int = float("inf")) -> None:
     print(len(pages_need_authority_control_template), flush=True)
     templatepage = pwb.Page(site, template, ns=10)
     modulepage = pwb.Page(site, module, ns=828)
-    t = 0
     for title in pages_need_authority_control_template:
         page = pwb.Page(site, title)
         if not page.botMayEdit() or page.isRedirectPage() or page.isDisambig() or any(tp in (templatepage, modulepage) for tp in page.itertemplates(namespaces=(10, 828))):
@@ -122,13 +121,9 @@ def main(limit:int = float("inf")) -> None:
         success = save(site, page, add_authority_control_template, summary, template = template)
         if success:
             print(title)
-            t += 1
-            if  t >= limit:
-                print("Finshed!", flush=True)
-                break
-            if t % 10 == 0 and not check_switch(site):
+            if not check_switch(site):
                 print("Stop!", flush=True)
                 break
 
 if __name__ == "__main__":
-    main(50)
+    main()
