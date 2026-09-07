@@ -48,7 +48,7 @@ def add_authority_control_template(text, site, template) -> str:
     text = textlib.removeCategoryLinks(text, site)
     DEFAULTSORT = DEFAULTSORT_PATTERN.findall(text)
     if DEFAULTSORT:
-        DEFAULTSORT = f"\n{DEFAULTSORT[0]}
+        DEFAULTSORT = f"\n{DEFAULTSORT[0]}"
     else:
         DEFAULTSORT = ""
     text = DEFAULTSORT_PATTERN.sub("", text)
