@@ -70,7 +70,7 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str, query_limit:int)
         offset = 0
         while True:
             query = query_string % (id, query_limit, offset)
-            print(query)
+            print(id, query_limit, offset)
             tries = 0
             while tries < 30:
                 try:
