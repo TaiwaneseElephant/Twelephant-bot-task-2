@@ -42,13 +42,6 @@ def save(site, page, func = lambda x:x, summary:str = "", max_retry_times:int = 
     print(f"The attempt to edit the page '{page.title()}' was stopped because of the error.", flush=True)
     return False
 
-def check_switch(site) -> bool:
-    try:
-        switch_page = pywikibot.Page(site, "User:Twelephant-bot/task/2/config.json")
-        return json.loads(switch_page.text)["Enable"]
-    except:
-        return False
-
 def add_authority_control_template(text, sitenow, template) -> str:
     cats = textlib.getCategoryLinks(text, sitenow)
     text = textlib.removeCategoryLinks(text, sitenow)
@@ -127,11 +120,19 @@ def main() -> None:
             continue
         success = save(site, page, add_authority_control_template, summary, sitenow = site, template = template)
         if success:
-            print(title)
             t += 1
-            if t % 10 == 0 and not check_switch(site):
-                print("Stop!", flush=True)
-                break
+            if t % 10 == 0:
+                try:
+                    config = json.loads(pywikibot.Page(site, "User:Twelephant-bot/task/2/config.json").text)
+                    template = config["template"]
+                    module = config["module"]
+                    summary = config["summary"]
+                    if not config["Enable"]:
+                        print("Stop!", flush=True)
+                        return
+                except:
+                    print("Failed to load config.")
+                    return
 
 if __name__ == "__main__":
     main()
