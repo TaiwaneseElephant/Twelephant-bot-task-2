@@ -8,32 +8,38 @@ DEFAULTSORT_PATTERN = re.compile(r"\{\{\s*DEFAULTSORT:[^}]+\s*\}\}")
 STUB_PATTERN = re.compile(r"\{\{\s*(?:(?:[^|}]*?-)?[Ss]tub(?:\s*\|[^}]*?)?|[^|}]*?小作品(?:\s*\|[^}]*?)?|小條目(?:\s*\|[^}]*?)?)\s*\}\}")
 
 def save(site, page, func = lambda x:x, summary:str = "", max_retry_times:int = 3, **kargs) -> bool:
-    e = None
-    if page.exists():
-        oringinal_text = page.get(force = True, get_redirect = False)
+    if page.exists() and page.botMayEdit():
+        original_text = page.text
     else:
       return False
     for _ in range(max_retry_times):
         try:
-            page.text = func(oringinal_text, site, **kargs)
-            page.save(summary, minor = True, bot=True)
-            return True
-        except pwb.exceptions.EditConflictError as e:
+            page.text = func(original_text, **kargs)
+            if page.text != original_text:
+                page.save(summary, minor = True, bot=True)
+                return True
+            else:
+                print("No difference.")
+                return False
+        except pywikibot.exceptions.EditConflictError:
             print(f"Warning! There is an edit conflict on page '{page.title()}'!", flush=True)
-            oringinal_text = page.get(force = True, get_redirect = False)
-        except pwb.exceptions.LockedPageError as e:
+            original_text = page.get(force = True, get_redirect = False)
+        except pywikibot.exceptions.LockedPageError:
             print(f"Warning! The edit attempt on page '{page.title()}' was disallowed because the page is protected!", flush=True)
             break
-        except pwb.exceptions.AbuseFilterDisallowedError as e:
+        except pywikibot.exceptions.AbuseFilterDisallowedError:
             print(f"Warning! The edit attempt on page '{page.title()}' was disallowed by the AbuseFilter!", flush=True)
             break
-        except pwb.exceptions.SpamblacklistError as e:
+        except pywikibot.exceptions.SpamblacklistError:
             print(f"Warning! The edit attempt on page '{page.title()}' was disallowed by the SpamFilter because the edit add blacklisted URL!", flush=True)
             break
-        except pwb.exceptions.TitleblacklistError as e:
+        except pywikibot.exceptions.TitleblacklistError:
             print(f"Warning! The edit attempt on page '{page.title()}' was disallowed because the title is blacklisted!", flush=True)
             break
-    print(f"The attempt to edit the page '{page.title()}' was stopped because of the error below:\n{e}.", flush=True)
+        except pywikibot.exceptions.OtherPageSaveError as e:
+            print(f"Warning! The edit attempt on page '{page.title()}' was disallowed due to {e}!", flush=True)
+            break
+    print(f"The attempt to edit the page '{page.title()}' was stopped because of the error.", flush=True)
     return False
 
 def check_switch(site) -> bool:
@@ -43,9 +49,9 @@ def check_switch(site) -> bool:
     except:
         return False
 
-def add_authority_control_template(text, site, template) -> str:
-    cats = textlib.getCategoryLinks(text, site)
-    text = textlib.removeCategoryLinks(text, site)
+def add_authority_control_template(text, sitenow, template) -> str:
+    cats = textlib.getCategoryLinks(text, sitenow)
+    text = textlib.removeCategoryLinks(text, sitenow)
     DEFAULTSORT = DEFAULTSORT_PATTERN.findall(text)
     if DEFAULTSORT:
         DEFAULTSORT = f"\n{DEFAULTSORT[0]}"
@@ -55,7 +61,7 @@ def add_authority_control_template(text, site, template) -> str:
     STUB = STUB_PATTERN.findall(text)
     text = STUB_PATTERN.sub("", text)
     text = f"{text.strip()}\n{{{{{template}}}}}{DEFAULTSORT}\n"
-    text = textlib.replaceCategoryLinks(text, cats, site, add_only = True)
+    text = textlib.replaceCategoryLinks(text, cats, sitenow, add_only = True)
     text = f"{text.strip()}\n{'\n'.join(STUB)}"
     return text
 
@@ -117,9 +123,9 @@ def main() -> None:
     t = 0
     for title in pages_need_authority_control_template:
         page = pwb.Page(site, title)
-        if not page.botMayEdit() or page.isRedirectPage() or page.isDisambig() or any(tp in (templatepage, modulepage) for tp in page.itertemplates(namespaces=(10, 828))):
+        if page.isRedirectPage() or page.isDisambig() or any(tp in (templatepage, modulepage) for tp in page.itertemplates(namespaces=(10, 828))):
             continue
-        success = save(site, page, add_authority_control_template, summary, template = template)
+        success = save(site, page, add_authority_control_template, summary, sitenow = site, template = template)
         if success:
             print(title)
             t += 1
