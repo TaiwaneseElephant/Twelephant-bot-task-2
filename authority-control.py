@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import pywikibot as pwb
+import pywikibot
 from pywikibot import textlib
 from pywikibot.data import sparql
 import re, time, json, requests
@@ -44,7 +44,7 @@ def save(site, page, func = lambda x:x, summary:str = "", max_retry_times:int = 
 
 def check_switch(site) -> bool:
     try:
-        switch_page = pwb.Page(site, "User:Twelephant-bot/task/2/config.json")
+        switch_page = pywikibot.Page(site, "User:Twelephant-bot/task/2/config.json")
         return json.loads(switch_page.text)["Enable"]
     except:
         return False
@@ -101,9 +101,9 @@ def getSparqlQuery(AUTHORITY_CONTROL_ID:list, query_string:str, query_limit:int)
     return pages
 
 def main() -> None:
-    site = pwb.Site("wikipedia:zh")
+    site = pywikibot.Site("wikipedia:zh")
     try:
-        config = json.loads(pwb.Page(site, "User:Twelephant-bot/task/2/config.json").text)
+        config = json.loads(pywikibot.Page(site, "User:Twelephant-bot/task/2/config.json").text)
         AUTHORITY_CONTROL_ID = config["authority control id"]
         template = config["template"]
         module = config["module"]
@@ -118,11 +118,11 @@ def main() -> None:
         return
     pages_need_authority_control_template = getSparqlQuery(AUTHORITY_CONTROL_ID, query_string, query_limit)
     print(len(pages_need_authority_control_template), flush=True)
-    templatepage = pwb.Page(site, template, ns=10)
-    modulepage = pwb.Page(site, module, ns=828)
+    templatepage = pywikibot.Page(site, template, ns=10)
+    modulepage = pywikibot.Page(site, module, ns=828)
     t = 0
     for title in pages_need_authority_control_template:
-        page = pwb.Page(site, title)
+        page = pywikibot.Page(site, title)
         if page.isRedirectPage() or page.isDisambig() or any(tp in (templatepage, modulepage) for tp in page.itertemplates(namespaces=(10, 828))):
             continue
         success = save(site, page, add_authority_control_template, summary, sitenow = site, template = template)
