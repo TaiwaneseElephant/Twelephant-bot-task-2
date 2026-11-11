@@ -43,6 +43,8 @@ def save(site, page, func = lambda x:x, summary:str = "", max_retry_times:int = 
     return False
 
 def add_authority_control_template(text, sitenow, template) -> str:
+    if f"{{{{{template}}}}}" in text:
+        return text
     cats = textlib.getCategoryLinks(text, sitenow)
     text = textlib.removeCategoryLinks(text, sitenow)
     DEFAULTSORT = DEFAULTSORT_PATTERN.findall(text)
